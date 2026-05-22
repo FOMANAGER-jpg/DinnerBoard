@@ -227,7 +227,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 
-<div class="header">
+<style>
+#password-screen{position:fixed;inset:0;background:#0f1117;display:flex;align-items:center;justify-content:center;z-index:9999;}
+#password-screen.hidden{display:none;}
+.pw-box{background:#1a1d27;border:1px solid rgba(255,255,255,0.14);border-radius:14px;padding:32px;width:320px;max-width:calc(100vw - 32px);text-align:center;}
+.pw-logo{font-size:32px;margin-bottom:12px;}
+.pw-title{font-size:18px;font-weight:600;color:#f0f2f8;margin-bottom:4px;}
+.pw-sub{font-size:13px;color:#8b90a8;margin-bottom:24px;}
+.pw-input{width:100%;background:#0f1117;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:12px 16px;color:#f0f2f8;font-family:'DM Sans',sans-serif;font-size:15px;text-align:center;letter-spacing:.15em;margin-bottom:12px;outline:none;}
+.pw-input:focus{border-color:#60a5fa;}
+.pw-btn{width:100%;background:#60a5fa;border:none;border-radius:10px;padding:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.pw-btn:hover{background:#3b82f6;}
+.pw-error{color:#f87171;font-size:12px;margin-top:8px;display:none;}
+.pw-error.show{display:block;}
+</style>
+
+<div id="password-screen">
+  <div class="pw-box">
+    <div class="pw-logo">🌙</div>
+    <div class="pw-title">White Rocks Hotel</div>
+    <div class="pw-sub">Dinner Buffet Board</div>
+    <input type="password" class="pw-input" id="pw-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPW()">
+    <button class="pw-btn" onclick="checkPW()">Enter</button>
+    <div class="pw-error" id="pw-error">Incorrect password</div>
+  </div>
+</div>
   <div><div class="hotel-name">White Rocks Hotel &amp; Bungalows</div><div class="page-title">Dinner Buffet Board</div></div>
   <div style="text-align:right;">
     <div class="live-date" id="live-date"></div>
@@ -377,6 +401,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div>
 
 <script>
+// ══════════════════════════════════════════════
+// PASSWORD PROTECTION
+// ══════════════════════════════════════════════
+const PASS = 'wr2026';
+function checkPW(){
+  const val = document.getElementById('pw-input').value;
+  if(val === PASS){
+    sessionStorage.setItem('wr_auth','1');
+    document.getElementById('password-screen').classList.add('hidden');
+  } else {
+    document.getElementById('pw-error').classList.add('show');
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+// Check if already authenticated this session
+if(sessionStorage.getItem('wr_auth')==='1'){
+  document.getElementById('password-screen').classList.add('hidden');
+} else {
+  setTimeout(()=>document.getElementById('pw-input').focus(), 100);
+}
+
 // TODAY is dynamic — uses current date automatically
 const TODAY = new Date().toISOString().split('T')[0];
 const LS_HISTORY = 'wr_dinner_history';
