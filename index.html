@@ -213,6 +213,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-cancel{flex:1;background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;}
 .btn-save{flex:2;border:none;border-radius:var(--radius);padding:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);}
 .btn-save.orange{background:var(--da);}
+/* PRINT */
+@media print{
+  body{background:#fff!important;color:#000!important;}
+  .header,.tab-bar,.fabs,#password-screen,#panel-board,#panel-report,#panel-history,#panel-import{display:none!important;}
+  #panel-stats{display:block!important;}
+  .print-hide{display:none!important;}
+  #stats-content,#manual-stats-content{background:#fff;color:#000;}
+  canvas{max-width:100%;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
 .btn-save.green{background:var(--lung);}
 .danger-zone{background:var(--red-bg);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 12px;margin-top:10px;}
 .danger-title{font-size:11px;color:var(--red);font-weight:700;margin-bottom:4px;}
@@ -265,6 +275,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <button class="tab" onclick="showTab('report',this)">&#9650; Report</button>
   <button class="tab" onclick="showTab('history',this)">&#128197; History</button>
   <button class="tab" onclick="showTab('import',this)">&#8679; Import</button>
+  <button class="tab" onclick="showTab('stats',this)">&#128202; Stats</button>
 </div>
 
 <!-- BOARD -->
@@ -400,6 +411,95 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
+<!-- STATS -->
+<div id="panel-stats" class="panel">
+  <div style="padding:14px 14px 100px;">
+    <div style="font-size:19px;font-weight:600;margin-bottom:16px;">&#128202; Statistics</div>
+
+    <!-- Tabs inside stats -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button id="stab-history" onclick="switchStatsTab('history')" style="flex:1;padding:10px;border:1px solid var(--blue);border-radius:var(--radius);background:var(--blue-bg);color:var(--blue);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128197; From History</button>
+      <button id="stab-manual" onclick="switchStatsTab('manual')" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#9998; Manual Entry</button>
+    </div>
+
+    <!-- FROM HISTORY -->
+    <div id="stats-history-section">
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;">Period</div>
+        <input type="date" id="stats-from" style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+        <span style="color:var(--muted);font-size:13px;">→</span>
+        <input type="date" id="stats-to" style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+        <button onclick="renderStats()" style="background:var(--blue);border:none;border-radius:var(--radius);padding:8px 16px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Show</button>
+      </div>
+      <div id="stats-content">
+        <div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">Select a date range and click Show</div>
+      </div>
+      <div id="stats-print-btn" style="display:none;margin-top:12px;">
+        <button onclick="window.print()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">&#128438; Print / Save as PDF</button>
+      </div>
+    </div>
+
+    <!-- MANUAL ENTRY -->
+    <div id="stats-manual-section" style="display:none;">
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Πρόσθεσε δεδομένα από χαρτί για παλιές μέρες. Θα συμπεριληφθούν στα γραφήματα.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Date</label>
+            <input type="date" id="me-date" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total HB rooms</label>
+            <input type="number" id="me-total" min="0" placeholder="e.g. 120" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Rooms arrived</label>
+            <input type="number" id="me-arrived" min="0" placeholder="e.g. 98" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total guests served</label>
+            <input type="number" id="me-guests" min="0" placeholder="e.g. 190" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">BB dinner revenue (€)</label>
+            <input type="number" id="me-bbrev" min="0" placeholder="e.g. 300" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">DA revenue (€)</label>
+            <input type="number" id="me-darev" min="0" placeholder="e.g. 150" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Peak hour</label>
+            <select id="me-peak" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+              <option value="">— Select —</option>
+              <option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Notes (optional)</label>
+            <input type="text" id="me-notes" placeholder="e.g. Full house, wedding group" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+        </div>
+        <button onclick="addManualEntry()" style="width:100%;background:var(--blue);border:none;border-radius:var(--radius);padding:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">+ Add Entry</button>
+      </div>
+
+      <!-- Saved manual entries -->
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:10px;">Saved entries</div>
+      <div id="manual-entries-list"></div>
+
+      <!-- Show stats from manual -->
+      <button onclick="renderManualStats()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;" class="print-hide">&#128202; Show Stats from Manual Entries</button>
+      <div id="manual-stats-content" style="margin-top:16px;"></div>
+      <div id="manual-print-btn" style="display:none;margin-top:12px;">
+        <button onclick="window.print()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">&#128438; Print / Save as PDF</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script>
 // ══════════════════════════════════════════════
 // PASSWORD PROTECTION
@@ -518,6 +618,17 @@ function showTab(name,btn){
   document.getElementById('fabs').style.display=name==='board'?'flex':'none';
   if(name==='report')renderReport(guests);
   if(name==='history')renderHistory();
+  if(name==='stats'){
+    // Set default date range — last 7 days
+    const today = new Date();
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate()-6);
+    if(!document.getElementById('stats-from').value)
+      document.getElementById('stats-from').value = weekAgo.toISOString().split('T')[0];
+    if(!document.getElementById('stats-to').value)
+      document.getElementById('stats-to').value = today.toISOString().split('T')[0];
+    renderStats();
+  }
 }
 function toggleFilter(m){
   filterMode=filterMode===m?null:m;
@@ -1049,6 +1160,396 @@ function confirmImport(){
   b.textContent='✓ '+importedRooms.length+' rooms imported!';b.classList.add('show');
   setTimeout(()=>b.classList.remove('show'),4000);
   importedRooms=[];
+}
+
+// ══════════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════════
+let chartRevenue=null, chartOccupancy=null, chartPeak=null;
+
+function renderStats(){
+  const from = document.getElementById('stats-from').value;
+  const to = document.getElementById('stats-to').value;
+  if(!from||!to){alert('Please select a date range.');return;}
+
+  const history = getHistory();
+  // Filter dates in range
+  const dates = Object.keys(history).filter(d=>d>=from&&d<=to).sort();
+
+  if(!dates.length){
+    document.getElementById('stats-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">No data found for this period.<br>Make sure the dates are saved in History.</div>';
+    return;
+  }
+
+  // Aggregate data
+  let totalRevenue=0, totalBBRev=0, totalDARev=0;
+  let totalRooms=0, totalDinnerRooms=0, totalArrived=0, totalGuests=0;
+  let peakHours={};
+  let daTotal=0, daPaidTotal=0;
+  let allergyCount=0;
+  let bestDay={date:'',rate:0};
+
+  const revenueByDay=[], occupancyByDay=[], dayLabels=[];
+
+  dates.forEach(date=>{
+    const data = history[date].guests;
+    const dinnerG = data.filter(g=>!g.noDinner);
+    const arrived = dinnerG.filter(g=>g.arrived);
+    const bbRev = data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const daRev = data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const dayRev = bbRev+daRev;
+    const dayRate = dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
+
+    totalRevenue+=dayRev; totalBBRev+=bbRev; totalDARev+=daRev;
+    totalRooms+=data.length; totalDinnerRooms+=dinnerG.length;
+    totalArrived+=arrived.length;
+    totalGuests+=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
+    daTotal+=data.filter(g=>g.dineAround).length;
+    daPaidTotal+=data.filter(g=>g.daPaid).length;
+    allergyCount+=data.filter(g=>g.allergy&&g.allergy.length>0).length;
+
+    // Peak hours
+    arrived.forEach(g=>{
+      if(g.arrivalTime){
+        const h=g.arrivalTime.split(':')[0]+':00';
+        peakHours[h]=(peakHours[h]||0)+1;
+      }
+    });
+
+    if(dayRate>bestDay.rate) bestDay={date,rate:dayRate};
+
+    revenueByDay.push(dayRev);
+    occupancyByDay.push(dayRate);
+    const d=new Date(date+'T12:00:00');
+    dayLabels.push(d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
+  });
+
+  const avgOccupancy = dates.length?Math.round(totalArrived/totalDinnerRooms*100):0;
+  const avgGuests = totalArrived?Math.round(totalGuests/totalArrived*10)/10:0;
+  const peakHour = Object.entries(peakHours).sort((a,b)=>b[1]-a[1])[0];
+  const bestDayObj = bestDay.date?new Date(bestDay.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'-';
+
+  // Peak hours chart data
+  const allHours=['18:00','19:00','20:00','21:00','22:00'];
+  const peakData=allHours.map(h=>peakHours[h]||0);
+
+  document.getElementById('stats-content').innerHTML=`
+    <!-- Summary cards -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:var(--green-bg);border:1px solid rgba(52,211,153,.25);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:700;margin-bottom:6px;">Total Revenue</div>
+        <div style="font-size:28px;font-weight:700;color:var(--green);">€${totalRevenue}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">BB €${totalBBRev} · DA €${totalDARev}</div>
+      </div>
+      <div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
+        <div style="font-size:28px;font-weight:700;color:var(--blue);">${avgOccupancy}%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${totalArrived} / ${totalDinnerRooms} dinner rooms</div>
+      </div>
+      <div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);font-weight:700;margin-bottom:6px;">Peak Hour</div>
+        <div style="font-size:28px;font-weight:700;color:var(--amber);">${peakHour?peakHour[0]:'-'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${peakHour?peakHour[1]+' arrivals':''}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:6px;">Best Day</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);">${bestDayObj}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${bestDay.rate}% attendance</div>
+      </div>
+    </div>
+
+    <!-- More stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Avg pax/room</div>
+        <div style="font-size:22px;font-weight:700;">${avgGuests}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">DA paid</div>
+        <div style="font-size:22px;font-weight:700;color:var(--da);">${daPaidTotal}<span style="font-size:13px;color:var(--muted);"> / ${daTotal}</span></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Allergy rooms</div>
+        <div style="font-size:22px;font-weight:700;color:var(--red);">${allergyCount}</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Revenue per day (€)</div>
+      <canvas id="chart-revenue" height="120"></canvas>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Occupancy % per day</div>
+      <canvas id="chart-occupancy" height="120"></canvas>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Arrivals by hour</div>
+      <canvas id="chart-peak" height="120"></canvas>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);text-align:center;padding:8px;">
+      ${dates.length} day${dates.length>1?'s':''} · ${totalRooms} total rooms · ${totalGuests} guests served
+    </div>
+  `;
+
+  // Show print button
+  document.getElementById('stats-print-btn').style.display='block';
+
+  // Chart defaults
+  Chart.defaults.color='#8b90a8';
+  Chart.defaults.borderColor='rgba(255,255,255,0.06)';
+
+  // Revenue chart
+  if(chartRevenue) chartRevenue.destroy();
+  chartRevenue = new Chart(document.getElementById('chart-revenue'),{
+    type:'bar',
+    data:{
+      labels:dayLabels,
+      datasets:[{
+        label:'Revenue (€)',
+        data:revenueByDay,
+        backgroundColor:'rgba(52,211,153,0.3)',
+        borderColor:'#34d399',
+        borderWidth:2,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}
+      }
+    }
+  });
+
+  // Occupancy chart
+  if(chartOccupancy) chartOccupancy.destroy();
+  chartOccupancy = new Chart(document.getElementById('chart-occupancy'),{
+    type:'line',
+    data:{
+      labels:dayLabels,
+      datasets:[{
+        label:'Occupancy %',
+        data:occupancyByDay,
+        borderColor:'#60a5fa',
+        backgroundColor:'rgba(96,165,250,0.1)',
+        borderWidth:2,
+        pointBackgroundColor:'#60a5fa',
+        pointRadius:4,
+        fill:true,
+        tension:0.3
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}
+      }
+    }
+  });
+
+  // Peak hours chart
+  if(chartPeak) chartPeak.destroy();
+  chartPeak = new Chart(document.getElementById('chart-peak'),{
+    type:'bar',
+    data:{
+      labels:allHours,
+      datasets:[{
+        label:'Arrivals',
+        data:peakData,
+        backgroundColor:'rgba(251,191,36,0.3)',
+        borderColor:'#fbbf24',
+        borderWidth:2,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{stepSize:1}}
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// STATS TAB SWITCH
+// ══════════════════════════════════════════════
+function switchStatsTab(tab){
+  const isHistory = tab==='history';
+  document.getElementById('stats-history-section').style.display=isHistory?'block':'none';
+  document.getElementById('stats-manual-section').style.display=isHistory?'none':'block';
+  document.getElementById('stab-history').style.borderColor=isHistory?'var(--blue)':'var(--border)';
+  document.getElementById('stab-history').style.background=isHistory?'var(--blue-bg)':'var(--surface)';
+  document.getElementById('stab-history').style.color=isHistory?'var(--blue)':'var(--muted)';
+  document.getElementById('stab-manual').style.borderColor=!isHistory?'var(--blue)':'var(--border)';
+  document.getElementById('stab-manual').style.background=!isHistory?'var(--blue-bg)':'var(--surface)';
+  document.getElementById('stab-manual').style.color=!isHistory?'var(--blue)':'var(--muted)';
+  if(!isHistory) renderManualList();
+}
+
+// ══════════════════════════════════════════════
+// MANUAL ENTRY
+// ══════════════════════════════════════════════
+const LS_MANUAL = 'wr_manual_stats';
+
+function getManualEntries(){
+  try{return JSON.parse(localStorage.getItem(LS_MANUAL)||'[]');}catch(e){return [];}
+}
+function saveManualEntries(entries){
+  localStorage.setItem(LS_MANUAL, JSON.stringify(entries));
+}
+
+function addManualEntry(){
+  const date=document.getElementById('me-date').value;
+  const total=parseInt(document.getElementById('me-total').value)||0;
+  const arrived=parseInt(document.getElementById('me-arrived').value)||0;
+  const guests=parseInt(document.getElementById('me-guests').value)||0;
+  const bbrev=parseInt(document.getElementById('me-bbrev').value)||0;
+  const darev=parseInt(document.getElementById('me-darev').value)||0;
+  const peak=document.getElementById('me-peak').value;
+  const notes=document.getElementById('me-notes').value.trim();
+
+  if(!date||!total||!arrived){alert('Please fill in Date, Total rooms and Rooms arrived.');return;}
+
+  const entries=getManualEntries();
+  // Replace if same date exists
+  const idx=entries.findIndex(e=>e.date===date);
+  const entry={date,total,arrived,guests,bbrev,darev,peak,notes,rev:bbrev+darev};
+  if(idx>=0) entries[idx]=entry; else entries.push(entry);
+  entries.sort((a,b)=>a.date.localeCompare(b.date));
+  saveManualEntries(entries);
+
+  // Clear fields
+  ['me-date','me-total','me-arrived','me-guests','me-bbrev','me-darev','me-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('me-peak').value='';
+
+  renderManualList();
+}
+
+function deleteManualEntry(date){
+  if(!confirm('Delete entry for '+date+'?'))return;
+  const entries=getManualEntries().filter(e=>e.date!==date);
+  saveManualEntries(entries);
+  renderManualList();
+}
+
+function renderManualList(){
+  const entries=getManualEntries();
+  const el=document.getElementById('manual-entries-list');
+  if(!entries.length){
+    el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px;">No entries yet. Add data above.</div>';
+    return;
+  }
+  el.innerHTML=entries.map(e=>{
+    const d=new Date(e.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+    const rate=e.total?Math.round(e.arrived/e.total*100):0;
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;">${d}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+          ${e.arrived}/${e.total} rooms · ${rate}% · €${e.rev}${e.peak?' · Peak '+e.peak:''}
+        </div>
+        ${e.notes?`<div style="font-size:11px;color:var(--blue);margin-top:2px;">📝 ${e.notes}</div>`:''}
+      </div>
+      <button onclick="deleteManualEntry('${e.date}')" style="background:transparent;border:1px solid rgba(248,113,113,.3);border-radius:6px;padding:5px 10px;color:var(--red);font-size:11px;cursor:pointer;">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function renderManualStats(){
+  const entries=getManualEntries();
+  if(!entries.length){
+    document.getElementById('manual-stats-content').innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);">No manual entries found.</div>';
+    return;
+  }
+
+  const totalRevenue=entries.reduce((s,e)=>s+e.rev,0);
+  const totalBBRev=entries.reduce((s,e)=>s+e.bbrev,0);
+  const totalDARev=entries.reduce((s,e)=>s+e.darev,0);
+  const totalArrived=entries.reduce((s,e)=>s+e.arrived,0);
+  const totalRooms=entries.reduce((s,e)=>s+e.total,0);
+  const totalGuests=entries.reduce((s,e)=>s+e.guests,0);
+  const avgOccupancy=totalRooms?Math.round(totalArrived/totalRooms*100):0;
+  const avgGuests=totalArrived?Math.round(totalGuests/totalArrived*10)/10:0;
+  const bestDay=entries.reduce((b,e)=>{const r=e.total?e.arrived/e.total:0;return r>b.rate?{date:e.date,rate:r}:b;},{date:'',rate:0});
+  const bestDayLabel=bestDay.date?new Date(bestDay.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'-';
+  const peakCounts={};
+  entries.forEach(e=>{if(e.peak)peakCounts[e.peak]=(peakCounts[e.peak]||0)+1;});
+  const topPeak=Object.entries(peakCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  const labels=entries.map(e=>new Date(e.date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
+  const revData=entries.map(e=>e.rev);
+  const occData=entries.map(e=>e.total?Math.round(e.arrived/e.total*100):0);
+
+  document.getElementById('manual-stats-content').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:var(--green-bg);border:1px solid rgba(52,211,153,.25);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:700;margin-bottom:6px;">Total Revenue</div>
+        <div style="font-size:28px;font-weight:700;color:var(--green);">€${totalRevenue}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">BB €${totalBBRev} · DA €${totalDARev}</div>
+      </div>
+      <div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
+        <div style="font-size:28px;font-weight:700;color:var(--blue);">${avgOccupancy}%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${totalArrived} / ${totalRooms} rooms</div>
+      </div>
+      <div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);font-weight:700;margin-bottom:6px;">Top Peak Hour</div>
+        <div style="font-size:28px;font-weight:700;color:var(--amber);">${topPeak?topPeak[0]:'-'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${topPeak?topPeak[1]+' days':''}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:6px;">Best Day</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);">${bestDayLabel}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${Math.round(bestDay.rate*100)}% attendance</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Avg pax/room</div>
+        <div style="font-size:22px;font-weight:700;">${avgGuests}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Days recorded</div>
+        <div style="font-size:22px;font-weight:700;">${entries.length}</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Revenue per day (€)</div>
+      <canvas id="manual-chart-rev" height="120"></canvas>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Occupancy % per day</div>
+      <canvas id="manual-chart-occ" height="120"></canvas>
+    </div>
+  `;
+
+  Chart.defaults.color='#8b90a8';
+  Chart.defaults.borderColor='rgba(255,255,255,0.06)';
+
+  new Chart(document.getElementById('manual-chart-rev'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Revenue (€)',data:revData,backgroundColor:'rgba(52,211,153,0.3)',borderColor:'#34d399',borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}}}
+  });
+
+  new Chart(document.getElementById('manual-chart-occ'),{
+    type:'line',
+    data:{labels,datasets:[{label:'Occupancy %',data:occData,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.1)',borderWidth:2,pointBackgroundColor:'#60a5fa',pointRadius:4,fill:true,tension:0.3}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  document.getElementById('manual-print-btn').style.display='block';
 }
 
 init();
