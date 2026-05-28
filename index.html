@@ -330,16 +330,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div id="panel-import" class="panel">
   <div class="import-wrap">
     <div class="import-title">&#8679; Import In-House List</div>
-    <div class="import-sub">Ανέβασε το PDF από το Protel.</div>
+    <div class="import-sub">Επίλεξε τύπο αρχείου από το Protel.</div>
+
+    <!-- File type selector -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button id="itype-pdf" onclick="switchImportType('pdf')" style="flex:1;padding:10px;border:1px solid var(--blue);border-radius:var(--radius);background:var(--blue-bg);color:var(--blue);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128196; PDF</button>
+      <button id="itype-chr" onclick="switchImportType('chr')" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128196; CHR / CSV</button>
+    </div>
+
     <div class="drop-zone" id="drop-zone"
       ondragover="dropOver(event)" ondragleave="dropLeave(event)" ondrop="dropFile(event)"
       onclick="document.getElementById('file-input').click()">
       <div class="drop-icon">&#128196;</div>
-      <div class="drop-title">Drag &amp; drop το PDF εδώ</div>
+      <div class="drop-title" id="drop-title">Drag &amp; drop το PDF εδώ</div>
       <div class="drop-sub">ή επίλεξε αρχείο</div>
       <button class="btn-browse" onclick="event.stopPropagation();document.getElementById('file-input').click()">&#128194; Browse file</button>
     </div>
-    <input type="file" id="file-input" accept=".pdf,.txt" style="display:none" onchange="handleFile(event)">
+    <input type="file" id="file-input" accept=".pdf,.txt,.chr,.csv" style="display:none" onchange="handleFile(event)">
     <div class="import-result" id="import-result">
       <div class="import-result-title" id="import-result-title"></div>
       <div class="import-preview" id="import-preview"></div>
@@ -1025,8 +1032,20 @@ function closeModal(id){
 });
 
 // ══════════════════════════════════════════════
-// IMPORT PDF
+// IMPORT — PDF / CHR
 // ══════════════════════════════════════════════
+let currentImportType='pdf';
+
+function switchImportType(type){
+  currentImportType=type;
+  const isPDF=type==='pdf';
+  document.getElementById('itype-pdf').style.cssText=`flex:1;padding:10px;border:1px solid ${isPDF?'var(--blue)':'var(--border)'};border-radius:var(--radius);background:${isPDF?'var(--blue-bg)':'var(--surface)'};color:${isPDF?'var(--blue)':'var(--muted)'};font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;`;
+  document.getElementById('itype-chr').style.cssText=`flex:1;padding:10px;border:1px solid ${!isPDF?'var(--blue)':'var(--border)'};border-radius:var(--radius);background:${!isPDF?'var(--blue-bg)':'var(--surface)'};color:${!isPDF?'var(--blue)':'var(--muted)'};font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;`;
+  document.getElementById('drop-title').textContent=isPDF?'Drag & drop το PDF εδώ':'Drag & drop το CHR/CSV εδώ';
+  document.getElementById('file-input').accept=isPDF?'.pdf,.txt':'.chr,.csv,.txt';
+  cancelImport();
+}
+
 function dropOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('drag-over');}
 function dropLeave(e){document.getElementById('drop-zone').classList.remove('drag-over');}
 function dropFile(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)processFile(f);}
@@ -1036,6 +1055,15 @@ function processFile(file){
   document.getElementById('import-result').classList.add('show');
   document.getElementById('import-result-title').textContent='Reading '+file.name+'...';
   document.getElementById('import-preview').innerHTML='<div style="color:var(--muted);padding:20px;text-align:center;">&#9203; Processing...</div>';
+
+  // CHR/CSV file
+  if(currentImportType==='chr'||file.name.endsWith('.chr')||file.name.endsWith('.csv')){
+    const r=new FileReader();
+    r.onload=function(e){parseCHR(e.target.result,file.name);};
+    r.readAsText(file);
+    return;
+  }
+
   if(file.name.endsWith('.pdf')){
     const r=new FileReader();
     r.onload=async function(e){await extractTextFromPDF(e.target.result,file.name);};
@@ -1069,6 +1097,60 @@ async function extractTextFromPDF(buffer,filename){
     }
     parseProtelText(fullText,filename);
   }catch(e){document.getElementById('import-result-title').textContent='Error: '+e.message;}
+}
+
+// ══════════════════════════════════════════════
+// CHR/CSV PARSER — Protel allowance format
+// ══════════════════════════════════════════════
+function parseCHR(text, filename){
+  const rooms=[];
+  const lines=text.split('\n').filter(l=>l.trim().length>0);
+
+  for(const line of lines){
+    // Parse CSV fields — handle quoted values
+    const fields=[];
+    let cur='', inQ=false;
+    for(let i=0;i<line.length;i++){
+      if(line[i]==='"'){inQ=!inQ;}
+      else if(line[i]===','&&!inQ){fields.push(cur.trim());cur='';}
+      else cur+=line[i];
+    }
+    fields.push(cur.trim());
+
+    // Each row: ...,"ROOM","PKG","GUEST","ARR","DEP","AD","EB","C1","C2","C3","C4","BF_AT","BF_CH","LU_AT","LU_CH","DIN_AT","DIN_CH","AI_AT","AI_CH"
+    // Find room field — 3-digit number
+    const roomIdx=fields.findIndex(f=>/^\d{3}$/.test(f));
+    if(roomIdx===-1) continue;
+
+    const room=fields[roomIdx];
+    const pkg=(fields[roomIdx+1]||'').trim();
+    const name=(fields[roomIdx+2]||'').trim();
+    const adults=parseInt(fields[roomIdx+5])||0;
+
+    // Dinner column = roomIdx+14 (DIN_AT)
+    const dinnerAt=parseInt(fields[roomIdx+14])||0;
+    const hasDinner=dinnerAt>0;
+
+    // Skip totals/summary rows
+    if(!name||name==='TOTAL:'||name==='ROOMS'||name==='ADULTS') continue;
+
+    rooms.push({
+      room,
+      name,
+      adults,
+      pkg:pkg||'HB',
+      allergy:'',
+      noDinner:!hasDinner||pkg==='BB',
+      arrived:false,
+      arrivalTime:'',
+      paidDinner:false,
+      dineAround:false,
+      daPaid:false,
+      lungomare:false
+    });
+  }
+
+  showImportPreview(rooms, filename);
 }
 
 function parseProtelText(text,filename){
