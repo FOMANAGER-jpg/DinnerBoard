@@ -1107,7 +1107,7 @@ function parseCHR(text, filename){
   const lines=text.split('\n').filter(l=>l.trim().length>0);
 
   for(const line of lines){
-    // Parse CSV fields — handle quoted values
+    // Parse all CSV fields handling quoted values
     const fields=[];
     let cur='', inQ=false;
     for(let i=0;i<line.length;i++){
@@ -1117,22 +1117,29 @@ function parseCHR(text, filename){
     }
     fields.push(cur.trim());
 
-    // Each row: ...,"ROOM","PKG","GUEST","ARR","DEP","AD","EB","C1","C2","C3","C4","BF_AT","BF_CH","LU_AT","LU_CH","DIN_AT","DIN_CH","AI_AT","AI_CH"
-    // Find room field — 3-digit number
+    // Find room number — 3-digit number field
     const roomIdx=fields.findIndex(f=>/^\d{3}$/.test(f));
     if(roomIdx===-1) continue;
 
     const room=fields[roomIdx];
+    // PKG is next non-empty field after room (may be empty string)
     const pkg=(fields[roomIdx+1]||'').trim();
+    // GUEST name is 2 fields after room
     const name=(fields[roomIdx+2]||'').trim();
+    // ARR = roomIdx+3, DEP = roomIdx+4, AD = roomIdx+5
     const adults=parseInt(fields[roomIdx+5])||0;
 
-    // Dinner column = roomIdx+14 (DIN_AT)
-    const dinnerAt=parseInt(fields[roomIdx+14])||0;
-    const hasDinner=dinnerAt>0;
+    // Dinner column: after AD,EB,C1,C2,C3,C4 = 6 fields, then BF_AT,BF_CH,LU_AT,LU_CH,DIN_AT
+    // roomIdx+5=AD, +6=EB, +7=C1, +8=C2, +9=C3, +10=C4
+    // +11=BF_AT, +12=BF_CH, +13=LU_AT, +14=LU_CH, +15=DIN_AT, +16=DIN_CH
+    const dinnerAt=parseInt(fields[roomIdx+15])||0;
 
-    // Skip totals/summary rows
-    if(!name||name==='TOTAL:'||name==='ROOMS'||name==='ADULTS') continue;
+    if(!name||name==='TOTAL:'||name==='ROOMS'||name==='ADULTS'||name==='Extra Bed :') continue;
+    // Skip if name looks like a number or date
+    if(/^\d/.test(name)) continue;
+
+    const hasDinner=dinnerAt>0;
+    const isBB=pkg==='BB';
 
     rooms.push({
       room,
@@ -1140,7 +1147,7 @@ function parseCHR(text, filename){
       adults,
       pkg:pkg||'HB',
       allergy:'',
-      noDinner:!hasDinner||pkg==='BB',
+      noDinner:!hasDinner||isBB,
       arrived:false,
       arrivalTime:'',
       paidDinner:false,
@@ -1156,56 +1163,64 @@ function parseCHR(text, filename){
 function parseProtelText(text,filename){
   const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
   const rooms=[];
-  let pendingAllergy='';
-  const allergyKw=['GLUTEN','LACTOSE','DIABETIC','ALLERG','INTOLERANT','VEGAN','VEGETARIAN','HALAL','KOSHER','NUT','DAIRY','CELIAC','KIWI','BLUEBERRY'];
+  const allergyKw=['GLUTEN','LACTOSE','DIABETIC','ALLERG','INTOLERANT','VEGAN','VEGETARIAN','HALAL','KOSHER','NUT','DAIRY','CELIAC','KIWI','BLUEBERRY','COELIAC','SESAME','COCONUT','SOS','SEVERE','THREAT','LIFE'];
+
+  function isAllergyLine(line){
+    return allergyKw.some(k=>line.toUpperCase().includes(k));
+  }
+  function isRoomLine(line){
+    return /\b\d{3}\b/.test(line) && /\b(HB|BB|FB|AI)\b/.test(line);
+  }
 
   for(let i=0;i<lines.length;i++){
     const line=lines[i];
-    const startsWithRoom=/^\d{3}\s/.test(line);
-    const hasAllergyKw=allergyKw.some(k=>line.toUpperCase().includes(k));
+    if(!isRoomLine(line)) continue;
 
-    // If line has allergy keyword and NO room number at start → pending allergy
-    if(hasAllergyKw&&!startsWithRoom){
-      pendingAllergy=(pendingAllergy?pendingAllergy+' · ':'')+line.trim();
-      continue;
-    }
-
-    // If line starts with room number but ALSO has allergy keyword inline
-    // e.g. "LACTOSE FREE 003 HB KENT-PAYNE..."
-    // Try to find room number anywhere in the line
-    const roomMatch=line.match(/\b(\d{3})\s+/);
-    if(!roomMatch)continue;
-
+    const roomMatch=line.match(/\b(\d{3})\b/);
+    if(!roomMatch) continue;
     const room=roomMatch[1];
-    const rest=line.slice(line.indexOf(roomMatch[0])+roomMatch[0].length);
 
-    const pkgMatch=rest.match(/\b(HB|BB|FB|AI)\b/)||line.match(/\b(HB|BB|FB|AI)\b/);
+    const pkgMatch=line.match(/\b(HB|BB|FB|AI)\b/);
     const pkg=pkgMatch?pkgMatch[1]:'HB';
 
-    // Extract name tokens (ALL CAPS, not dates, not pkg, not numbers)
-    const allTokens=rest.split(/\s+/).concat(line.split(/\s+/));
-    const nameTokens=[...new Set(allTokens)].filter(t=>{
-      if(['HB','BB','FB','AI'].includes(t))return false;
-      if(/^\d/.test(t))return false;
-      if(t.length<2)return false;
-      if(/^[A-Z][A-Z\-]+$/.test(t)||/^[A-Z]{2,}$/.test(t))return true;
+    // Extract name — ALL CAPS words, not pkg, not numbers, not dates
+    const tokens=line.split(/\s+/).filter(t=>{
+      if(['HB','BB','FB','AI'].includes(t)) return false;
+      if(/^\d/.test(t)) return false;
+      if(t.length<2) return false;
+      if(allergyKw.includes(t.toUpperCase())) return false;
+      if(/^[A-Z][A-Z\'\-]+$/.test(t)||/^[A-Z]{2,}$/.test(t)) return true;
       return false;
-    }).filter(t=>!allergyKw.includes(t)&&!['FREE','INTOLERANT','HUSBAND','WIFE'].includes(t));
+    });
+    const name=tokens.slice(0,3).join(' ');
+    if(!name||name.length<2) continue;
 
-    const name=nameTokens.slice(0,3).join(' ');
-    if(!name||name.length<2)continue;
-
-    const adultsMatch=rest.match(/\b([1-9])\s+0\s+0/);
+    const adultsMatch=line.match(/\b([1-9])\s+0\s+0/);
     const adults=adultsMatch?parseInt(adultsMatch[1]):2;
 
-    // Check for allergy in the line itself
-    let lineAllergy='';
-    if(hasAllergyKw){
-      lineAllergy=allergyKw.filter(k=>line.toUpperCase().includes(k)).join(', ');
+    // Check NEXT line(s) for allergy info
+    // Allergies can appear on the line immediately after the room line
+    let allergy='';
+
+    // Also check if allergy is on the same line
+    if(isAllergyLine(line)){
+      allergy=line.replace(/\d{3}/g,'').replace(/\b(HB|BB|FB|AI)\b/g,'').replace(/\d+\/\d+\/\d+/g,'').replace(/\b\d+\b/g,'').trim();
+      allergy=allergyKw.filter(k=>line.toUpperCase().includes(k)).join(' + ');
     }
 
-    const allergy=pendingAllergy||(lineAllergy||'');
-    pendingAllergy='';
+    // Look ahead for allergy line right after this room
+    if(!allergy){
+      let j=i+1;
+      // Skip blank and collect allergy lines that follow this room
+      while(j<lines.length && !isRoomLine(lines[j])){
+        if(isAllergyLine(lines[j])){
+          allergy=(allergy?allergy+' · ':'')+lines[j].trim();
+        }
+        j++;
+        // Stop after 2 non-room lines to avoid false positives
+        if(j>i+3) break;
+      }
+    }
 
     const hasDinner=pkg!=='BB'&&adults>0;
     rooms.push({room,name,adults,pkg,allergy,noDinner:!hasDinner,arrived:false,arrivalTime:'',paidDinner:false,dineAround:false,daPaid:false,lungomare:false});
