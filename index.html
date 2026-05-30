@@ -1540,6 +1540,126 @@ function deleteManualEntry(date){
   renderManualList();
 }
 
+function saveManualToHistory(date){
+  const entries=getManualEntries();
+  const e=entries.find(x=>x.date===date);
+  if(!e) return;
+
+  // Check if already exists in history
+  const h=getHistory();
+  if(h[date]&&!confirm('History already has data for '+date+'.\nOverwrite with manual entry?')) return;
+
+  // Build synthetic guests array from manual entry data
+  // Create fake HB rooms for arrived count
+  const syntheticGuests=[];
+  const paxPerRoom=e.guests&&e.arrived?Math.round(e.guests/e.arrived):2;
+
+  // Arrived rooms
+  for(let i=0;i<e.arrived;i++){
+    syntheticGuests.push({
+      room:String(100+i).padStart(3,'0'),
+      name:'GUEST '+(i+1),
+      adults:paxPerRoom,
+      pkg:'HB',
+      allergy:'',
+      noDinner:false,
+      arrived:true,
+      arrivalTime:e.peak||'20:00',
+      paidDinner:false,
+      dineAround:false,
+      daPaid:false,
+      lungomare:false,
+      _manual:true
+    });
+  }
+  // Not arrived rooms
+  const notArrived=e.total-e.arrived;
+  for(let i=0;i<notArrived;i++){
+    syntheticGuests.push({
+      room:String(500+i).padStart(3,'0'),
+      name:'GUEST '+(e.arrived+i+1),
+      adults:2,
+      pkg:'HB',
+      allergy:'',
+      noDinner:false,
+      arrived:false,
+      arrivalTime:'',
+      paidDinner:false,
+      dineAround:false,
+      daPaid:false,
+      lungomare:false,
+      _manual:true
+    });
+  }
+  // BB rooms for revenue
+  if(e.bbrev>0){
+    const bbRooms=Math.round(e.bbrev/100);
+    for(let i=0;i<bbRooms;i++){
+      syntheticGuests.push({
+        room:String(700+i).padStart(3,'0'),
+        name:'BB GUEST '+(i+1),
+        adults:2,
+        pkg:'BB',
+        allergy:'',
+        noDinner:false,
+        arrived:true,
+        arrivalTime:e.peak||'20:00',
+        paidDinner:true,
+        dineAround:false,
+        daPaid:false,
+        lungomare:false,
+        _manual:true
+      });
+    }
+  }
+  // DA rooms for revenue
+  if(e.darev>0){
+    const daRooms=Math.round(e.darev/100);
+    for(let i=0;i<daRooms;i++){
+      syntheticGuests.push({
+        room:String(800+i).padStart(3,'0'),
+        name:'DA GUEST '+(i+1),
+        adults:2,
+        pkg:'HB',
+        allergy:'',
+        noDinner:false,
+        arrived:true,
+        arrivalTime:e.peak||'20:00',
+        paidDinner:false,
+        dineAround:true,
+        daPaid:true,
+        lungomare:false,
+        _manual:true
+      });
+    }
+  }
+
+  h[date]={
+    date,
+    savedAt:'Manual entry',
+    manual:true,
+    notes:e.notes||'',
+    guests:syntheticGuests
+  };
+  localStorage.setItem(LS_HISTORY,JSON.stringify(h));
+
+  const badge=document.getElementById('autosave-badge');
+  badge.textContent='✓ Saved to History: '+date;
+  badge.style.color='var(--green)';
+  badge.classList.add('show');
+  setTimeout(()=>badge.classList.remove('show'),3000);
+
+  // Switch to history tab to show it
+  if(confirm('Saved to History! Go to History tab to see it?')){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab')[2].classList.add('active');
+    document.getElementById('panel-history').classList.add('active');
+    document.getElementById('fabs').style.display='none';
+    renderHistory();
+  }
+}
+
 function renderManualList(){
   const entries=getManualEntries();
   const el=document.getElementById('manual-entries-list');
@@ -1550,15 +1670,22 @@ function renderManualList(){
   el.innerHTML=entries.map(e=>{
     const d=new Date(e.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
     const rate=e.total?Math.round(e.arrived/e.total*100):0;
-    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
-      <div style="flex:1;">
-        <div style="font-size:14px;font-weight:600;">${d}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-          ${e.arrived}/${e.total} rooms · ${rate}% · €${e.rev}${e.peak?' · Peak '+e.peak:''}
+    const h=getHistory();
+    const inHistory=!!h[e.date];
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;">${d}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+            ${e.arrived}/${e.total} rooms · ${rate}% · €${e.rev}${e.peak?' · Peak '+e.peak:''}
+          </div>
+          ${e.notes?`<div style="font-size:11px;color:var(--blue);margin-top:2px;">📝 ${e.notes}</div>`:''}
         </div>
-        ${e.notes?`<div style="font-size:11px;color:var(--blue);margin-top:2px;">📝 ${e.notes}</div>`:''}
+        <button onclick="deleteManualEntry('${e.date}')" style="background:transparent;border:1px solid rgba(248,113,113,.3);border-radius:6px;padding:5px 10px;color:var(--red);font-size:11px;cursor:pointer;">✕</button>
       </div>
-      <button onclick="deleteManualEntry('${e.date}')" style="background:transparent;border:1px solid rgba(248,113,113,.3);border-radius:6px;padding:5px 10px;color:var(--red);font-size:11px;cursor:pointer;">✕</button>
+      <button onclick="saveManualToHistory('${e.date}')" style="width:100%;background:${inHistory?'var(--surface2)':'var(--green-bg)'};border:1px solid ${inHistory?'var(--border)':'rgba(52,211,153,.3)'};border-radius:6px;padding:7px;color:${inHistory?'var(--muted)':'var(--green)'};font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">
+        ${inHistory?'✓ Already in History — Save again':'&#128190; Save to History'}
+      </button>
     </div>`;
   }).join('');
 }
