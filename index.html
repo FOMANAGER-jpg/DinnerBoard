@@ -579,10 +579,17 @@ function pushToFirebase(){
   },800);
 }
 
-// Save to local history at 22:00
+// Save today to BOTH Firebase and localStorage
 function saveToday(silent){
-  const h=getHistory();
-  h[TODAY]={date:TODAY,savedAt:nowTime(),guests:JSON.parse(JSON.stringify(guests))};
+  const entry={date:TODAY,savedAt:nowTime(),guests:JSON.parse(JSON.stringify(guests))};
+  // Save to Firebase history
+  if(fbConnected){
+    window._fbSet('dinner_history/'+TODAY, entry)
+      .catch(e=>console.error('History save error:',e));
+  }
+  // Also save locally as backup
+  const h=getLocalHistory();
+  h[TODAY]=entry;
   localStorage.setItem(LS_HISTORY,JSON.stringify(h));
   if(!silent){
     const b=document.getElementById('autosave-badge');
@@ -590,11 +597,37 @@ function saveToday(silent){
     setTimeout(()=>setSyncBadge('live','● Live sync'),3000);
   }
 }
-function getHistory(){try{return JSON.parse(localStorage.getItem(LS_HISTORY)||'{}');}catch(e){return {};}}
+
+function getLocalHistory(){try{return JSON.parse(localStorage.getItem(LS_HISTORY)||'{}');}catch(e){return {};}}
+
+// getHistory now merges Firebase + localStorage
+let _fbHistory={};
+function getHistory(){
+  // Merge Firebase history with local history
+  const local=getLocalHistory();
+  return Object.assign({},local,_fbHistory);
+}
+
+function initFirebaseHistory(){
+  if(!window._fbReady) return;
+  // Listen to full history from Firebase
+  window._fbListen('dinner_history',(data)=>{
+    if(data&&typeof data==='object'){
+      _fbHistory=data;
+      // Also cache locally
+      localStorage.setItem(LS_HISTORY,JSON.stringify(Object.assign(getLocalHistory(),data)));
+      // Re-render history if tab is open
+      if(document.getElementById('panel-history').classList.contains('active')){
+        renderHistory();
+      }
+    }
+  });
+}
 
 function init(){
   render();renderReport(guests);renderHistory();
   initFirebase();
+  initFirebaseHistory();
   startAutoSave();
 }
 function startAutoSave(){
@@ -1642,6 +1675,11 @@ function saveManualToHistory(date){
     guests:syntheticGuests
   };
   localStorage.setItem(LS_HISTORY,JSON.stringify(h));
+  // Also save to Firebase
+  if(fbConnected){
+    window._fbSet('dinner_history/'+date, h[date])
+      .catch(err=>console.error('Firebase history error:',err));
+  }
 
   const badge=document.getElementById('autosave-badge');
   badge.textContent='✓ Saved to History: '+date;
