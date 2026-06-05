@@ -424,9 +424,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div style="font-size:19px;font-weight:600;margin-bottom:16px;">&#128202; Statistics</div>
 
     <!-- Tabs inside stats -->
-    <div style="display:flex;gap:8px;margin-bottom:16px;">
-      <button id="stab-history" onclick="switchStatsTab('history')" style="flex:1;padding:10px;border:1px solid var(--blue);border-radius:var(--radius);background:var(--blue-bg);color:var(--blue);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128197; From History</button>
-      <button id="stab-manual" onclick="switchStatsTab('manual')" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#9998; Manual Entry</button>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button id="stab-history" onclick="switchStatsTab('history')" style="flex:1;min-width:80px;padding:10px;border:1px solid var(--blue);border-radius:var(--radius);background:var(--blue-bg);color:var(--blue);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128197; Daily</button>
+      <button id="stab-weekly" onclick="switchStatsTab('weekly')" style="flex:1;min-width:80px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128200; Weekly</button>
+      <button id="stab-manual" onclick="switchStatsTab('manual')" style="flex:1;min-width:80px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#9998; Manual</button>
     </div>
 
     <!-- FROM HISTORY -->
@@ -442,6 +443,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">Select a date range and click Show</div>
       </div>
       <div id="stats-print-btn" style="display:none;margin-top:12px;">
+        <button onclick="window.print()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">&#128438; Print / Save as PDF</button>
+      </div>
+    </div>
+
+    <!-- WEEKLY ANALYTICS -->
+    <div id="stats-weekly-section" style="display:none;">
+
+      <!-- Filter controls -->
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Filter by Month</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="month-filter-btns"></div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Select weeks to compare</div>
+        <div id="week-selector" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button onclick="selectAllWeeks()" style="flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:7px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;">Select All</button>
+          <button onclick="clearAllWeeks()" style="flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:7px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;">Clear</button>
+          <button onclick="renderWeeklyStats()" style="flex:2;background:var(--blue);border:none;border-radius:var(--radius);padding:7px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128200; Compare</button>
+        </div>
+      </div>
+
+      <div id="weekly-content"><div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">Select weeks and click Compare</div></div>
+      <div id="weekly-print-btn" style="display:none;margin-top:12px;">
         <button onclick="window.print()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">&#128438; Print / Save as PDF</button>
       </div>
     </div>
@@ -1515,16 +1538,301 @@ function renderStats(){
 // STATS TAB SWITCH
 // ══════════════════════════════════════════════
 function switchStatsTab(tab){
-  const isHistory = tab==='history';
-  document.getElementById('stats-history-section').style.display=isHistory?'block':'none';
-  document.getElementById('stats-manual-section').style.display=isHistory?'none':'block';
-  document.getElementById('stab-history').style.borderColor=isHistory?'var(--blue)':'var(--border)';
-  document.getElementById('stab-history').style.background=isHistory?'var(--blue-bg)':'var(--surface)';
-  document.getElementById('stab-history').style.color=isHistory?'var(--blue)':'var(--muted)';
-  document.getElementById('stab-manual').style.borderColor=!isHistory?'var(--blue)':'var(--border)';
-  document.getElementById('stab-manual').style.background=!isHistory?'var(--blue-bg)':'var(--surface)';
-  document.getElementById('stab-manual').style.color=!isHistory?'var(--blue)':'var(--muted)';
-  if(!isHistory) renderManualList();
+  const tabs=['history','weekly','manual'];
+  tabs.forEach(t=>{
+    const el=document.getElementById('stats-'+t+'-section');
+    const btn=document.getElementById('stab-'+t);
+    if(!el||!btn) return;
+    const active=t===tab;
+    el.style.display=active?'block':'none';
+    btn.style.borderColor=active?'var(--blue)':'var(--border)';
+    btn.style.background=active?'var(--blue-bg)':'var(--surface)';
+    btn.style.color=active?'var(--blue)':'var(--muted)';
+  });
+  if(tab==='manual') renderManualList();
+  if(tab==='weekly') initWeeklySelector();
+}
+
+// ══════════════════════════════════════════════
+// WEEKLY ANALYTICS
+// ══════════════════════════════════════════════
+let selectedWeeks=new Set(), activeMonthFilter=null;
+
+function getWeekKey(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const day=d.getDay();
+  const diff=d.getDate()-day+(day===0?-6:1); // Monday
+  const mon=new Date(d.setDate(diff));
+  return mon.toISOString().split('T')[0];
+}
+
+function getWeekLabel(weekKey){
+  const mon=new Date(weekKey+'T12:00:00');
+  const sun=new Date(mon);sun.setDate(sun.getDate()+6);
+  const fmt=(d)=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  return fmt(mon)+' – '+fmt(sun);
+}
+
+function getWeeksFromHistory(){
+  const history=getHistory();
+  const weeks={};
+  Object.keys(history).sort().forEach(date=>{
+    const wk=getWeekKey(date);
+    if(!weeks[wk]) weeks[wk]=[];
+    weeks[wk].push(date);
+  });
+  return weeks;
+}
+
+function getMonthsFromHistory(){
+  const history=getHistory();
+  const months=new Set();
+  Object.keys(history).forEach(date=>{
+    months.add(date.substring(0,7)); // YYYY-MM
+  });
+  return [...months].sort();
+}
+
+function initWeeklySelector(){
+  const weeks=getWeeksFromHistory();
+  const months=getMonthsFromHistory();
+
+  // Month filter buttons
+  const mEl=document.getElementById('month-filter-btns');
+  mEl.innerHTML='<button onclick="filterWeeksByMonth(null)" id="mf-all" style="padding:6px 12px;border:1px solid var(--blue);border-radius:20px;background:var(--blue-bg);color:var(--blue);font-family:\'DM Sans\',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">All</button>';
+  months.forEach(m=>{
+    const [y,mo]=m.split('-');
+    const label=new Date(y,parseInt(mo)-1,1).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+    mEl.innerHTML+=`<button onclick="filterWeeksByMonth('${m}')" id="mf-${m}" style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;">${label}</button>`;
+  });
+
+  renderWeekSelector(weeks);
+}
+
+function filterWeeksByMonth(month){
+  activeMonthFilter=month;
+  // Update button styles
+  document.querySelectorAll('[id^="mf-"]').forEach(b=>{
+    const isActive=(month===null&&b.id==='mf-all')||(b.id==='mf-'+month);
+    b.style.borderColor=isActive?'var(--blue)':'var(--border)';
+    b.style.background=isActive?'var(--blue-bg)':'var(--surface)';
+    b.style.color=isActive?'var(--blue)':'var(--muted)';
+    b.style.fontWeight=isActive?'600':'400';
+  });
+  const weeks=getWeeksFromHistory();
+  renderWeekSelector(weeks, month);
+}
+
+function renderWeekSelector(weeks, monthFilter){
+  const el=document.getElementById('week-selector');
+  const weekKeys=Object.keys(weeks).sort().reverse();
+  const filtered=monthFilter?weekKeys.filter(wk=>wk.startsWith(monthFilter)||weeks[wk].some(d=>d.startsWith(monthFilter))):weekKeys;
+
+  if(!filtered.length){
+    el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px;">No data for this period.</div>';
+    return;
+  }
+
+  el.innerHTML=filtered.map(wk=>{
+    const days=weeks[wk].length;
+    const checked=selectedWeeks.has(wk);
+    return `<label style="display:flex;align-items:center;gap:10px;background:${checked?'var(--blue-bg)':'var(--surface)'};border:1px solid ${checked?'rgba(96,165,250,.3)':'var(--border)'};border-radius:var(--radius);padding:9px 12px;cursor:pointer;transition:all .15s;">
+      <input type="checkbox" ${checked?'checked':''} onchange="toggleWeek('${wk}',this)" style="accent-color:var(--blue);width:16px;height:16px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:${checked?'var(--blue)':'var(--text)'};">${getWeekLabel(wk)}</div>
+        <div style="font-size:11px;color:var(--muted);">${days} day${days>1?'s':''} of data</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function toggleWeek(wk, cb){
+  if(cb.checked) selectedWeeks.add(wk);
+  else selectedWeeks.delete(wk);
+  // Update appearance
+  const weeks=getWeeksFromHistory();
+  renderWeekSelector(weeks, activeMonthFilter);
+}
+
+function selectAllWeeks(){
+  const weeks=getWeeksFromHistory();
+  Object.keys(weeks).forEach(wk=>selectedWeeks.add(wk));
+  renderWeekSelector(weeks, activeMonthFilter);
+}
+
+function clearAllWeeks(){
+  selectedWeeks.clear();
+  const weeks=getWeeksFromHistory();
+  renderWeekSelector(weeks, activeMonthFilter);
+}
+
+function renderWeeklyStats(){
+  if(!selectedWeeks.size){alert('Please select at least one week.');return;}
+  const history=getHistory();
+  const weeks=getWeeksFromHistory();
+  const sortedWks=[...selectedWeeks].sort();
+
+  // Build per-week aggregates
+  const weekData=sortedWks.map(wk=>{
+    const dates=weeks[wk]||[];
+    let totalRooms=0,totalDinner=0,totalArrived=0,totalGuests=0;
+    let bbTotal=0,bbPaid=0,daTotal=0,daPaid=0;
+    const hourCounts={};
+    let daysWithData=0;
+
+    dates.forEach(date=>{
+      if(!history[date]) return;
+      const data=history[date].guests;
+      daysWithData++;
+      const dinnerG=data.filter(g=>!g.noDinner);
+      const arrived=dinnerG.filter(g=>g.arrived);
+      totalRooms+=data.length;
+      totalDinner+=dinnerG.length;
+      totalArrived+=arrived.length;
+      totalGuests+=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
+      bbTotal+=data.filter(g=>g.pkg==='BB').length;
+      bbPaid+=data.filter(g=>g.paidDinner).length;
+      daTotal+=data.filter(g=>g.dineAround).length;
+      daPaid+=data.filter(g=>g.daPaid).length;
+      arrived.forEach(g=>{
+        if(g.arrivalTime){
+          const h=g.arrivalTime.split(':')[0]+':00';
+          hourCounts[h]=(hourCounts[h]||0)+1;
+        }
+      });
+    });
+
+    const bbRev=data=>data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const daRev=data=>data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    let totalRev=0;
+    dates.forEach(date=>{
+      if(!history[date]) return;
+      totalRev+=bbRev(history[date].guests)+daRev(history[date].guests);
+    });
+
+    const avgOcc=totalDinner?Math.round(totalArrived/totalDinner*100):0;
+    const sortedHours=Object.entries(hourCounts).sort((a,b)=>b[1]-a[1]);
+    const peakHour=sortedHours[0]?sortedHours[0][0]:'-';
+    const quietHour=sortedHours[sortedHours.length-1]?sortedHours[sortedHours.length-1][0]:'-';
+
+    return {wk,label:getWeekLabel(wk),daysWithData,totalRooms,totalDinner,totalArrived,totalGuests,bbTotal,bbPaid,daTotal,daPaid,totalRev,avgOcc,peakHour,quietHour,avgRev:daysWithData?Math.round(totalRev/daysWithData):0};
+  });
+
+  const labels=weekData.map(w=>w.label);
+
+  document.getElementById('weekly-content').innerHTML=`
+    <!-- Overview cards -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
+      ${weekData.length===1?`
+      <div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
+        <div style="font-size:28px;font-weight:700;color:var(--blue);">${weekData[0].avgOcc}%</div>
+        <div style="font-size:11px;color:var(--muted);">${weekData[0].totalArrived}/${weekData[0].totalDinner} dinner rooms</div>
+      </div>
+      <div style="background:var(--green-bg);border:1px solid rgba(52,211,153,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:6px;">Total Revenue</div>
+        <div style="font-size:28px;font-weight:700;color:var(--green);">€${weekData[0].totalRev}</div>
+        <div style="font-size:11px;color:var(--muted);">Avg €${weekData[0].avgRev}/day</div>
+      </div>
+      <div style="background:var(--da-bg);border:1px solid rgba(249,115,22,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--da);font-weight:700;margin-bottom:6px;">Dine Around</div>
+        <div style="font-size:28px;font-weight:700;color:var(--da);">${weekData[0].daPaid}<span style="font-size:14px;color:var(--muted);"> / ${weekData[0].daTotal}</span></div>
+        <div style="font-size:11px;color:var(--muted);">paid / total DA</div>
+      </div>
+      <div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:6px;">BB Dinner</div>
+        <div style="font-size:28px;font-weight:700;color:var(--amber);">${weekData[0].bbPaid}<span style="font-size:14px;color:var(--muted);"> / ${weekData[0].bbTotal}</span></div>
+        <div style="font-size:11px;color:var(--muted);">paid / total BB rooms</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px;">Peak Hour</div>
+        <div style="font-size:28px;font-weight:700;color:var(--text);">${weekData[0].peakHour}</div>
+        <div style="font-size:11px;color:var(--muted);">busiest arrival hour</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px;">Quietest Hour</div>
+        <div style="font-size:28px;font-weight:700;color:var(--text);">${weekData[0].quietHour}</div>
+        <div style="font-size:11px;color:var(--muted);">fewest arrivals</div>
+      </div>`:''}
+    </div>
+
+    <!-- Comparison table for multiple weeks -->
+    ${weekData.length>1?`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px;">
+      <div style="padding:12px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">Weekly Comparison</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600;white-space:nowrap;">Week</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Occ%</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Revenue</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">DA paid</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">BB paid</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Peak</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Quiet</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${weekData.map((w,i)=>`
+            <tr style="border-bottom:1px solid var(--border);background:${i%2===0?'transparent':'rgba(255,255,255,.02)'};">
+              <td style="padding:10px 12px;font-weight:600;color:var(--text);white-space:nowrap;">${w.label}</td>
+              <td style="padding:10px 8px;text-align:center;color:${w.avgOcc>=80?'var(--green)':w.avgOcc>=60?'var(--amber)':'var(--red)'};">${w.avgOcc}%</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--green);font-weight:600;">€${w.totalRev}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--da);">${w.daPaid}/${w.daTotal}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--amber);">${w.bbPaid}/${w.bbTotal}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--text);">${w.peakHour}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--muted);">${w.quietHour}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--muted);">${w.daysWithData}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`:''}
+
+    <!-- Charts -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Occupancy % per week</div>
+      <canvas id="wk-chart-occ" height="130"></canvas>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Revenue per week (€)</div>
+      <canvas id="wk-chart-rev" height="130"></canvas>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">DA paid vs BB paid per week</div>
+      <canvas id="wk-chart-bb-da" height="130"></canvas>
+    </div>
+  `;
+
+  document.getElementById('weekly-print-btn').style.display='block';
+  Chart.defaults.color='#8b90a8';
+  Chart.defaults.borderColor='rgba(255,255,255,0.06)';
+
+  new Chart(document.getElementById('wk-chart-occ'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Occupancy %',data:weekData.map(w=>w.avgOcc),backgroundColor:'rgba(96,165,250,0.3)',borderColor:'#60a5fa',borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  new Chart(document.getElementById('wk-chart-rev'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Revenue €',data:weekData.map(w=>w.totalRev),backgroundColor:'rgba(52,211,153,0.3)',borderColor:'#34d399',borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}}}
+  });
+
+  new Chart(document.getElementById('wk-chart-bb-da'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'DA paid',data:weekData.map(w=>w.daPaid),backgroundColor:'rgba(249,115,22,0.4)',borderColor:'#f97316',borderWidth:2,borderRadius:4},
+        {label:'BB paid',data:weekData.map(w=>w.bbPaid),backgroundColor:'rgba(251,191,36,0.4)',borderColor:'#fbbf24',borderWidth:2,borderRadius:4}
+      ]
+    },
+    options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#8b90a8'}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{stepSize:1}}}}
+  });
 }
 
 // ══════════════════════════════════════════════
