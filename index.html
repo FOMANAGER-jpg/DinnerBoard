@@ -972,6 +972,7 @@ function renderHistory(){
           <div class="history-stat">Arrived <span>${arrived.length}/${dinnerG.length}</span></div>
           <div class="history-stat">Rate <span style="color:${rate>=80?'var(--green)':rate>=60?'var(--amber)':'var(--red)'}">${rate}%</span></div>
           <div class="history-stat">Rev <span style="color:var(--green)">€${bbRev+daRev}</span></div>
+          <button onclick="event.stopPropagation();exportDayJSON('${date}')" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;">&#8659; JSON</button>
           <span class="history-chevron">&#9656;</span>
         </div>
       </div>
