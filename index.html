@@ -320,7 +320,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="history-wrap">
     <div class="history-header">
       <div class="history-title">&#128197; History</div>
-      <button style="background:var(--blue);border:none;border-radius:var(--radius);padding:8px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;" onclick="saveToday()">&#128190; Save Now</button>
+      <div style="display:flex;gap:8px;">
+        <button onclick="exportAllJSON()" style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 12px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#8659; JSON (All)</button>
+        <button style="background:var(--blue);border:none;border-radius:var(--radius);padding:8px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;" onclick="saveToday()">&#128190; Save Now</button>
+      </div>
     </div>
     <div class="history-list" id="history-list"></div>
   </div>
@@ -975,13 +978,110 @@ function renderHistory(){
       <div class="history-detail">
         <div>${buildReportHTML(data,dateLabel)}</div>
         <div class="history-action-row">
-          <button class="btn-export-day" onclick="exportHistoryDay('${date}')">&#8659; Export .txt</button>
+          <button class="btn-export-day" onclick="exportHistoryDay('${date}')">&#8659; .txt</button>
+          <button class="btn-export-day" onclick="exportDayJSON('${date}')">&#8659; JSON</button>
           <button class="btn-delete-day" onclick="deleteHistoryDay('${date}')">&#128465; Delete</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
+function exportAllJSON(){
+  const history=getHistory();
+  const dates=Object.keys(history).sort();
+  if(!dates.length){alert('No history data to export.');return;}
+
+  // Build clean export object
+  const exportData={
+    hotel:'White Rocks Hotel & Bungalows',
+    type:'dinner',
+    exportedAt:new Date().toISOString(),
+    totalDays:dates.length,
+    days:dates.map(date=>{
+      const entry=history[date];
+      const data=entry.guests||[];
+      const dinnerG=data.filter(g=>!g.noDinner);
+      const arrived=dinnerG.filter(g=>g.arrived);
+      const bbRev=data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+      const daRev=data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+      return {
+        date,
+        savedAt:entry.savedAt,
+        manual:entry.manual||false,
+        summary:{
+          totalRooms:data.length,
+          dinnerRooms:dinnerG.length,
+          arrivedRooms:arrived.length,
+          occupancyPct:dinnerG.length?Math.round(arrived.length/dinnerG.length*100):0,
+          guestsServed:arrived.reduce((s,g)=>s+(Number(g.adults)||0),0),
+          bbRooms:data.filter(g=>g.pkg==='BB').length,
+          bbPaidDinner:data.filter(g=>g.paidDinner).length,
+          daTotal:data.filter(g=>g.dineAround).length,
+          daPaid:data.filter(g=>g.daPaid).length,
+          lungomareRooms:data.filter(g=>g.lungomare).length,
+          bbRevenue:bbRev,
+          daRevenue:daRev,
+          totalRevenue:bbRev+daRev
+        },
+        rooms:data.map(g=>({
+          room:g.room,
+          name:g.name,
+          adults:g.adults,
+          pkg:g.pkg,
+          allergy:g.allergy||'',
+          arrived:g.arrived,
+          arrivalTime:g.arrivalTime||'',
+          paidDinner:g.paidDinner||false,
+          dineAround:g.dineAround||false,
+          daPaid:g.daPaid||false,
+          lungomare:g.lungomare||false
+        }))
+      };
+    })
+  };
+
+  const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='white-rocks-dinner-history.json';
+  a.click();
+}
+
+function exportDayJSON(date){
+  const history=getHistory();
+  const entry=history[date];
+  if(!entry){alert('No data for '+date);return;}
+  const data=entry.guests||[];
+  const dinnerG=data.filter(g=>!g.noDinner);
+  const arrived=dinnerG.filter(g=>g.arrived);
+  const bbRev=data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+  const daRev=data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+  const exportData={
+    hotel:'White Rocks Hotel & Bungalows',
+    type:'dinner',
+    date,
+    savedAt:entry.savedAt,
+    manual:entry.manual||false,
+    summary:{
+      totalRooms:data.length,
+      dinnerRooms:dinnerG.length,
+      arrivedRooms:arrived.length,
+      occupancyPct:dinnerG.length?Math.round(arrived.length/dinnerG.length*100):0,
+      guestsServed:arrived.reduce((s,g)=>s+(Number(g.adults)||0),0),
+      bbRooms:data.filter(g=>g.pkg==='BB').length,
+      bbPaidDinner:data.filter(g=>g.paidDinner).length,
+      daTotal:data.filter(g=>g.dineAround).length,
+      daPaid:data.filter(g=>g.daPaid).length,
+      bbRevenue:bbRev,daRevenue:daRev,totalRevenue:bbRev+daRev
+    },
+    rooms:data.map(g=>({room:g.room,name:g.name,adults:g.adults,pkg:g.pkg,allergy:g.allergy||'',arrived:g.arrived,arrivalTime:g.arrivalTime||'',paidDinner:g.paidDinner||false,dineAround:g.dineAround||false,daPaid:g.daPaid||false,lungomare:g.lungomare||false}))
+  };
+  const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`dinner-${date}.json`;a.click();
+}
+
 function toggleHistoryCard(date){document.getElementById('hcard-'+date).classList.toggle('expanded');}
 function deleteHistoryDay(date){if(!confirm('Delete '+date+'?'))return;const h=getHistory();delete h[date];localStorage.setItem(LS_HISTORY,JSON.stringify(h));renderHistory();}
 function exportHistoryDay(date){const h=getHistory();const e=h[date];if(!e)return;exportData(e.guests,new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),date);}
@@ -2120,6 +2220,62 @@ function renderManualStats(){
   });
 
   document.getElementById('manual-print-btn').style.display='block';
+}
+
+// ══════════════════════════════════════════════
+// CHR PARSER — exact field positions
+// ══════════════════════════════════════════════
+function parseCHR(text, filename){
+  const rooms=[];
+  const lines=text.split('\n').filter(l=>l.trim().length>0);
+
+  for(const line of lines){
+    const fields=[];
+    let cur='', inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='"'){inQ=!inQ;}
+      else if(ch===','&&!inQ){fields.push(cur.trim());cur='';}
+      else cur+=ch;
+    }
+    fields.push(cur.trim());
+
+    if(fields.length<55) continue;
+
+    // Verified exact positions from allowance.chr:
+    // [36]=ROOM, [37]=empty, [38]=PKG, [39]=GUEST
+    // [40]=ARR, [41]=DEP, [42]=AD
+    // [48]=BF_AT, [50]=LU_AT, [52]=DIN_AT, [54]=AI_AT
+    const room=fields[36];
+    if(!/^\d{3}$/.test(room)) continue;
+
+    const pkg=(fields[38]||'').trim();
+    const name=(fields[39]||'').trim();
+    const adults=parseInt(fields[42])||0;
+    const dinAt=parseInt(fields[52])||0;
+
+    if(!name||name==='TOTAL:'||name==='ROOMS'||name==='ADULTS') continue;
+
+    const isBB=pkg==='BB';
+    const hasDinner=dinAt>0;
+
+    rooms.push({
+      room,
+      name,
+      adults,
+      pkg:pkg||'HB',
+      allergy:'',
+      noDinner:!hasDinner||isBB,
+      arrived:false,
+      arrivalTime:'',
+      paidDinner:false,
+      dineAround:false,
+      daPaid:false,
+      lungomare:false
+    });
+  }
+
+  showImportPreview(rooms, filename);
 }
 
 init();
