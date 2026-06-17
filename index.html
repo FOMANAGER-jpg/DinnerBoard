@@ -325,11 +325,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="history-wrap">
     <div class="history-header">
       <div class="history-title">&#128197; History</div>
-      <div style="display:flex;gap:8px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button onclick="exportAllJSON()" style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 12px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#8659; JSON (All)</button>
+        <button onclick="document.getElementById('import-json-input').click()" style="background:var(--surface);border:1px solid rgba(52,211,153,.3);border-radius:var(--radius);padding:8px 12px;color:var(--green);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#8679; Import JSON</button>
         <button style="background:var(--blue);border:none;border-radius:var(--radius);padding:8px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;" onclick="saveToday()">&#128190; Save Now</button>
       </div>
     </div>
+    <input type="file" id="import-json-input" accept=".json" style="display:none" onchange="importJSONHistory(event)">
     <div class="history-list" id="history-list"></div>
   </div>
 </div>
@@ -992,6 +994,60 @@ function renderHistory(){
     </div>`;
   }).join('');
 }
+function importJSONHistory(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      // Support both full export format and raw history object
+      let days=[];
+      if(data.days&&Array.isArray(data.days)){
+        days=data.days; // Full export format
+      } else if(typeof data==='object'){
+        // Raw history object {date: entry}
+        days=Object.values(data);
+      }
+      if(!days.length){alert('No data found in JSON file.');return;}
+
+      const h=getHistory();
+      let imported=0, skipped=0;
+
+      days.forEach(entry=>{
+        const date=entry.date;
+        if(!date) return;
+        if(h[date]){
+          skipped++;
+        }
+        // Build history entry
+        h[date]={
+          date,
+          savedAt:entry.savedAt||'Imported',
+          manual:entry.manual||false,
+          guests:entry.rooms||entry.guests||[]
+        };
+        imported++;
+        // Also save to Firebase
+        if(fbConnected){
+          window._fbSet('dinner_history/'+date, h[date])
+            .catch(err=>console.error(err));
+        }
+      });
+
+      localStorage.setItem(LS_HISTORY,JSON.stringify(h));
+      _fbHistory=h;
+      renderHistory();
+
+      alert(`✓ Imported ${imported} day${imported!==1?'s':''}${skipped?' ('+skipped+' already existed and were updated)':''}`);
+    }catch(err){
+      alert('Error reading JSON: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
 function exportAllJSON(){
   const history=getHistory();
   const dates=Object.keys(history).sort();
