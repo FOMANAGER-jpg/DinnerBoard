@@ -719,6 +719,7 @@ function render(){
   const dinnerG=guests.filter(g=>!g.noDinner);
   const arrived=dinnerG.filter(g=>g.arrived);
   const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
+  const totalExpected=dinnerG.reduce((s,g)=>s+(Number(g.adults)||0),0);
 
   // Truly pending = dinner rooms that haven't arrived AND are not DA or Lungomare
   const trulyPending=dinnerG.filter(g=>!g.arrived&&!g.dineAround&&!g.lungomare);
@@ -732,7 +733,7 @@ function render(){
   document.getElementById('s-total').textContent=guests.length;
   document.getElementById('s-arrived').textContent=arrived.length;
   document.getElementById('s-pending').textContent=trulyPending.length;
-  document.getElementById('s-guests').textContent=served;
+  document.getElementById('s-guests').textContent=served+'/'+totalExpected;
   document.getElementById('rem-count').textContent=trulyPending.length;
 
   let subParts=[];
@@ -864,6 +865,7 @@ function buildReportHTML(data, dateLabel){
 
   const rate=dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
   const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
+  const totalExpected=dinnerG.reduce((s,g)=>s+(Number(g.adults)||0),0);
   const paidBBList=data.filter(g=>g.paidDinner);
   const bbRev=paidBBList.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
   const daRev=daPaid.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
@@ -891,7 +893,7 @@ function buildReportHTML(data, dateLabel){
       <div class="stat-card"><div class="stat-label">In-house</div><div class="stat-value">${data.length}</div></div>
       <div class="stat-card"><div class="stat-label">At dinner</div><div class="stat-value green">${arrived.length}</div></div>
       <div class="stat-card"><div class="stat-label">Rate</div><div class="stat-value blue">${rate}%</div></div>
-      <div class="stat-card"><div class="stat-label">Guests served</div><div class="stat-value">${served}</div></div>
+      <div class="stat-card"><div class="stat-label">Guests served</div><div class="stat-value">${served}/${totalExpected}</div></div>
     </div>
 
     <div class="report-section">
@@ -939,7 +941,7 @@ function buildReportHTML(data, dateLabel){
       <div class="sum-row"><span class="sum-key">Not yet arrived</span><span class="sum-val amber">${absent.length}</span></div>
       <div class="sum-row"><span class="sum-key">At Lungomare</span><span class="sum-val" style="color:var(--lung);">${lungList.length}</span></div>
       <div class="sum-row"><span class="sum-key">No dinner / BB</span><span class="sum-val">${noDinner.length}</span></div>
-      <div class="sum-row"><span class="sum-key">Guests served</span><span class="sum-val blue">${served}</span></div>
+      <div class="sum-row"><span class="sum-key">Guests served</span><span class="sum-val blue">${served}/${totalExpected}</span></div>
       <div class="sum-row"><span class="sum-key">Avg pax/room</span><span class="sum-val">${avg}</span></div>
       <div class="sum-row"><span class="sum-key">First arrival</span><span class="sum-val">${first}</span></div>
       <div class="sum-row"><span class="sum-key">Last arrival</span><span class="sum-val">${last}</span></div>
