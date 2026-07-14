@@ -332,6 +332,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
     <input type="file" id="import-json-input" accept=".json" style="display:none" onchange="importJSONHistory(event)">
+
+    <!-- GUEST SEARCH -->
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:16px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:10px;">&#128269; Search Guest History</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="history-search-input" placeholder="Room number or guest name..." oninput="searchGuestHistory()"
+          style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+        <button onclick="clearHistorySearch()" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;">Clear</button>
+      </div>
+      <div id="history-search-results" style="margin-top:12px;"></div>
+    </div>
+
     <div class="history-list" id="history-list"></div>
   </div>
 </div>
@@ -719,7 +731,6 @@ function render(){
   const dinnerG=guests.filter(g=>!g.noDinner);
   const arrived=dinnerG.filter(g=>g.arrived);
   const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
-  const totalExpected=dinnerG.reduce((s,g)=>s+(Number(g.adults)||0),0);
 
   // Truly pending = dinner rooms that haven't arrived AND are not DA or Lungomare
   const trulyPending=dinnerG.filter(g=>!g.arrived&&!g.dineAround&&!g.lungomare);
@@ -733,7 +744,7 @@ function render(){
   document.getElementById('s-total').textContent=guests.length;
   document.getElementById('s-arrived').textContent=arrived.length;
   document.getElementById('s-pending').textContent=trulyPending.length;
-  document.getElementById('s-guests').textContent=served+'/'+totalExpected;
+  document.getElementById('s-guests').textContent=served;
   document.getElementById('rem-count').textContent=trulyPending.length;
 
   let subParts=[];
@@ -865,7 +876,6 @@ function buildReportHTML(data, dateLabel){
 
   const rate=dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
   const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
-  const totalExpected=dinnerG.reduce((s,g)=>s+(Number(g.adults)||0),0);
   const paidBBList=data.filter(g=>g.paidDinner);
   const bbRev=paidBBList.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
   const daRev=daPaid.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
@@ -893,7 +903,7 @@ function buildReportHTML(data, dateLabel){
       <div class="stat-card"><div class="stat-label">In-house</div><div class="stat-value">${data.length}</div></div>
       <div class="stat-card"><div class="stat-label">At dinner</div><div class="stat-value green">${arrived.length}</div></div>
       <div class="stat-card"><div class="stat-label">Rate</div><div class="stat-value blue">${rate}%</div></div>
-      <div class="stat-card"><div class="stat-label">Guests served</div><div class="stat-value">${served}/${totalExpected}</div></div>
+      <div class="stat-card"><div class="stat-label">Guests served</div><div class="stat-value">${served}</div></div>
     </div>
 
     <div class="report-section">
@@ -941,7 +951,7 @@ function buildReportHTML(data, dateLabel){
       <div class="sum-row"><span class="sum-key">Not yet arrived</span><span class="sum-val amber">${absent.length}</span></div>
       <div class="sum-row"><span class="sum-key">At Lungomare</span><span class="sum-val" style="color:var(--lung);">${lungList.length}</span></div>
       <div class="sum-row"><span class="sum-key">No dinner / BB</span><span class="sum-val">${noDinner.length}</span></div>
-      <div class="sum-row"><span class="sum-key">Guests served</span><span class="sum-val blue">${served}/${totalExpected}</span></div>
+      <div class="sum-row"><span class="sum-key">Guests served</span><span class="sum-val blue">${served}</span></div>
       <div class="sum-row"><span class="sum-key">Avg pax/room</span><span class="sum-val">${avg}</span></div>
       <div class="sum-row"><span class="sum-key">First arrival</span><span class="sum-val">${first}</span></div>
       <div class="sum-row"><span class="sum-key">Last arrival</span><span class="sum-val">${last}</span></div>
@@ -996,6 +1006,72 @@ function renderHistory(){
     </div>`;
   }).join('');
 }
+function clearHistorySearch(){
+  document.getElementById('history-search-input').value='';
+  document.getElementById('history-search-results').innerHTML='';
+}
+
+function searchGuestHistory(){
+  const q=document.getElementById('history-search-input').value.trim().toLowerCase();
+  const el=document.getElementById('history-search-results');
+  if(q.length<2){el.innerHTML='';return;}
+
+  const history=getHistory();
+  const dates=Object.keys(history).sort().reverse();
+  const results=[];
+
+  dates.forEach(date=>{
+    const entry=history[date];
+    const data=entry.guests||[];
+    const matches=data.filter(g=>
+      g.room.toLowerCase().includes(q)||
+      g.name.toLowerCase().includes(q)
+    );
+    matches.forEach(g=>{
+      results.push({date,entry,guest:g});
+    });
+  });
+
+  if(!results.length){
+    el.innerHTML=`<div style="color:var(--muted);font-size:13px;padding:8px 0;">No results for "${q}"</div>`;
+    return;
+  }
+
+  el.innerHTML=`
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${results.length} result${results.length>1?'s':''} found</div>
+    ${results.map(r=>{
+      const d=new Date(r.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+      const g=r.guest;
+      const arrived=g.arrived;
+      const time=g.arrivalTime||'';
+      const status=arrived
+        ?`<span style="color:var(--green);font-weight:600;">✓ Arrived ${time?'at '+time:''}</span>`
+        :g.lungomare
+          ?`<span style="color:var(--lung);">🍽 Lungomare</span>`
+          :g.dineAround&&!g.daPaid
+            ?`<span style="color:var(--da);">✗ DA — did not come</span>`
+            :`<span style="color:var(--muted);">✗ Did not come</span>`;
+      const extras=[];
+      if(g.paidDinner) extras.push(`<span style="background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">BB €${Number(g.adults)*50}</span>`);
+      if(g.daPaid) extras.push(`<span style="background:var(--da-bg);color:var(--da);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">DA €${Number(g.adults)*50}</span>`);
+      if(g.allergy) extras.push(`<span style="background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 6px;font-size:10px;">⚠ ${g.allergy}</span>`);
+
+      return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;margin-bottom:7px;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-family:'DM Mono',monospace;font-size:15px;font-weight:500;min-width:38px;">${g.room}</span>
+          <span style="font-size:14px;font-weight:600;flex:1;">${g.name}</span>
+          <span style="font-size:11px;color:var(--muted);">${g.pkg} · ${g.adults} adult${Number(g.adults)>1?'s':''}</span>
+        </div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:var(--muted);">${d}</span>
+          <span style="font-size:12px;">${status}</span>
+          ${extras.join(' ')}
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
 function importJSONHistory(e){
   const file=e.target.files[0];
   if(!file) return;
