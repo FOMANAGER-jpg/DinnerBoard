@@ -2215,27 +2215,39 @@ function saveManualToHistory(date){
     }
   }
 
-  h[date]={
+  const entry={
     date,
     savedAt:'Manual entry',
     manual:true,
     notes:e.notes||'',
     guests:syntheticGuests
   };
-  localStorage.setItem(LS_HISTORY,JSON.stringify(h));
-  // Also save to Firebase
+
+  // Update ALL storage locations
+  _fbHistory[date]=entry;
+  const local=getLocalHistory();
+  local[date]=entry;
+  localStorage.setItem(LS_HISTORY,JSON.stringify(local));
+
+  // Save to Firebase
   if(fbConnected){
-    window._fbSet('dinner_history/'+date, h[date])
+    window._fbSet('dinner_history/'+date, entry)
+      .then(()=>{
+        const badge=document.getElementById('autosave-badge');
+        badge.textContent='✓ Saved to History: '+date;
+        badge.style.color='var(--green)';badge.classList.add('show');
+        setTimeout(()=>badge.classList.remove('show'),3000);
+      })
       .catch(err=>console.error('Firebase history error:',err));
+  } else {
+    const badge=document.getElementById('autosave-badge');
+    badge.textContent='✓ Saved to History: '+date;
+    badge.style.color='var(--green)';badge.classList.add('show');
+    setTimeout(()=>badge.classList.remove('show'),3000);
   }
 
-  const badge=document.getElementById('autosave-badge');
-  badge.textContent='✓ Saved to History: '+date;
-  badge.style.color='var(--green)';
-  badge.classList.add('show');
-  setTimeout(()=>badge.classList.remove('show'),3000);
+  renderManualList();
 
-  // Switch to history tab to show it
   if(confirm('Saved to History! Go to History tab to see it?')){
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
