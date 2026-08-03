@@ -1015,6 +1015,8 @@ function renderHistory(){
     </div>`;
   }).filter(Boolean).join('');
 }
+
+function clearHistorySearch(){
   document.getElementById('history-search-input').value='';
   document.getElementById('history-search-results').innerHTML='';
 }
