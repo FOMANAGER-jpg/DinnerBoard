@@ -494,52 +494,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <!-- MANUAL ENTRY -->
     <div id="stats-manual-section" style="display:none;">
       <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Πρόσθεσε δεδομένα από χαρτί για παλιές μέρες. Θα συμπεριληφθούν στα γραφήματα.</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Date</label>
-            <input type="date" id="me-date" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total HB rooms</label>
-            <input type="number" id="me-total" min="0" placeholder="e.g. 120" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Rooms arrived</label>
-            <input type="number" id="me-arrived" min="0" placeholder="e.g. 98" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total guests served</label>
-            <input type="number" id="me-guests" min="0" placeholder="e.g. 190" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">BB dinner revenue (€)</label>
-            <input type="number" id="me-bbrev" min="0" placeholder="e.g. 300" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">DA revenue (€)</label>
-            <input type="number" id="me-darev" min="0" placeholder="e.g. 150" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Peak hour</label>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Πρόσθεσε δεδομένα από χαρτί για παλιές μέρες.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;">
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Date</label>
+            <input type="date" id="me-date" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total HB rooms</label>
+            <input type="number" id="me-total" min="0" placeholder="e.g. 120" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Rooms arrived</label>
+            <input type="number" id="me-arrived" min="0" placeholder="e.g. 98" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total guests served</label>
+            <input type="number" id="me-guests" min="0" placeholder="e.g. 190" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">BB dinner revenue (€)</label>
+            <input type="number" id="me-bbrev" min="0" placeholder="e.g. 300" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">DA revenue (€)</label>
+            <input type="number" id="me-darev" min="0" placeholder="e.g. 150" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Peak hour</label>
             <select id="me-peak" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
               <option value="">— Select —</option>
               <option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Notes (optional)</label>
-            <input type="text" id="me-notes" placeholder="e.g. Full house, wedding group" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-          </div>
+            </select></div>
+          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Notes (optional)</label>
+            <input type="text" id="me-notes" placeholder="e.g. Full house, wedding group" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
         </div>
         <button onclick="addManualEntry()" style="width:100%;background:var(--blue);border:none;border-radius:var(--radius);padding:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">+ Add Entry</button>
       </div>
-
-      <!-- Saved manual entries -->
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:10px;">Saved entries</div>
       <div id="manual-entries-list"></div>
-
-      <!-- Show stats from manual -->
       <button onclick="renderManualStats()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;" class="print-hide">&#128202; Show Stats from Manual Entries</button>
       <div id="manual-stats-content" style="margin-top:16px;"></div>
       <div id="manual-print-btn" style="display:none;margin-top:12px;">
