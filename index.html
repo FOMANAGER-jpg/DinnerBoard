@@ -626,15 +626,15 @@ let _fbHistory={};
 function getHistory(){ return _fbHistory; }
 
 function initFirebaseHistory(){
-  if(!window._fbReady){ document.addEventListener('firebase-ready', initFirebaseHistory); return; }
+  if(!window._fbReady){
+    document.addEventListener('firebase-ready', ()=>initFirebaseHistory());
+    return;
+  }
   // Listen to full history from Firebase
   window._fbListen('dinner_history',(data)=>{
-    if(data&&typeof data==='object'){
+    if(data&&typeof data==='object'&&Object.keys(data).length>0){
       _fbHistory=data;
-      // Re-render history if tab is open
-      if(document.getElementById('panel-history').classList.contains('active')){
-        renderHistory();
-      }
+      renderHistory();
     }
   });
 }
