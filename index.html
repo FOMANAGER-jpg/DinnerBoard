@@ -516,7 +516,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Notes (optional)</label>
             <input type="text" id="me-notes" placeholder="e.g. Full house, wedding group" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
         </div>
-        <button onclick="addManualEntry()" style="width:100%;background:var(--blue);border:none;border-radius:var(--radius);padding:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">+ Add Entry</button>
+        <button id="btn-add-manual-entry" style="width:100%;background:var(--blue);border:none;border-radius:var(--radius);padding:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">+ Add Entry</button>
       </div>
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:10px;">Saved entries</div>
       <div id="manual-entries-list"></div>
@@ -654,6 +654,9 @@ function init(){
   initFirebase();
   initFirebaseHistory();
   startAutoSave();
+  // Attach manual entry button listener
+  const btn=document.getElementById('btn-add-manual-entry');
+  if(btn) btn.addEventListener('click', addManualEntry);
 }
 function startAutoSave(){
   // Check every minute for 22:00
