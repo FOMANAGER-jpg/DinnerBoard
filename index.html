@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>White Rocks — Breakfast Board</title>
+<title>White Rocks — Dinner Board</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
@@ -14,19 +14,22 @@ import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebase
 const firebaseConfig = {
   apiKey: "AIzaSyCTLy2osf3ORBYdOm-EqpxiYbQkpOrlBIU",
   authDomain: "diningboard-d9537.firebaseapp.com",
-  databaseURL: "https://breakfast-dining-board-default-rtdb.europe-west1.firebasedatabase.app",
+  databaseURL: "https://diningboard-d9537-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "diningboard-d9537",
   storageBucket: "diningboard-d9537.firebasestorage.app",
   messagingSenderId: "784177296893",
-  appId: "1:784177296893:web:4b5b4d933c1b1efcfa5594"
+  appId: "1:784177296893:web:852b36e467f97c14fa5594"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Expose Firebase functions globally so rest of app can use them
 window._fbSet = (path, data) => set(ref(db, path), data);
 window._fbListen = (path, cb) => onValue(ref(db, path), snap => cb(snap.val()));
 window._fbReady = true;
+
+// Notify app that Firebase is ready
 document.dispatchEvent(new Event('firebase-ready'));
 </script>
 <style>
@@ -38,46 +41,51 @@ document.dispatchEvent(new Event('firebase-ready'));
   --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.12);
   --blue:#60a5fa;--blue-bg:rgba(96,165,250,0.1);
   --red:#f87171;--red-bg:rgba(248,113,113,0.12);
-  --gold:#f59e0b;--gold-bg:rgba(245,158,11,0.12);
+  --da:#f97316;--da-bg:rgba(249,115,22,0.12);
+  --lung:#10b981;--lung-bg:rgba(16,185,129,0.12);
   --radius:10px;--radius-lg:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .hotel-name{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;}
-.page-title{font-size:17px;font-weight:600;color:var(--gold);}
-.live-time{font-family:'DM Mono',monospace;font-size:15px;color:var(--gold);font-weight:500;}
+.page-title{font-size:17px;font-weight:600;}
+.live-time{font-family:'DM Mono',monospace;font-size:15px;color:var(--blue);font-weight:500;}
 .live-date{font-size:10px;color:var(--muted);}
 .autosave-badge{font-size:10px;color:var(--green);background:var(--green-bg);border:1px solid rgba(52,211,153,.2);border-radius:5px;padding:2px 7px;margin-top:3px;display:none;}
 .autosave-badge.show{display:inline-block;}
 .tab-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 12px;}
 .tab{flex:1;padding:12px 6px;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;}
-.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
 .panel{display:none;}.panel.active{display:block;}
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;}
 .stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;}
 .stat-value{font-size:24px;font-weight:600;line-height:1;}
-.stat-value.green{color:var(--green);}.stat-value.amber{color:var(--amber);}.stat-value.blue{color:var(--blue);}.stat-value.gold{color:var(--gold);}
+.stat-value.green{color:var(--green);}.stat-value.amber{color:var(--amber);}.stat-value.blue{color:var(--blue);}
 .rem-banner{margin:0 12px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:12px 16px;display:flex;align-items:center;gap:14px;}
 .rem-info{flex:1;}.rem-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:2px;}
 .rem-count{font-size:30px;font-weight:700;color:var(--amber);line-height:1;}
 .rem-sub{font-size:11px;color:var(--muted);margin-top:2px;}
 .prog-col{flex:2;}.prog-track{background:rgba(255,255,255,.06);border-radius:99px;height:7px;overflow:hidden;margin-bottom:4px;}
-.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .5s ease;}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#3b82f6,#34d399);transition:width .5s ease;}
 .prog-pct{font-size:11px;color:var(--muted);text-align:right;}
-.controls{display:flex;gap:8px;padding:0 12px 10px;}
-.search-wrap{flex:1;position:relative;}
+.controls{display:flex;gap:8px;padding:0 12px 10px;flex-wrap:wrap;}
+.search-wrap{flex:1;min-width:120px;position:relative;}
 .search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 10px 9px 32px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;}
 .search-wrap input::placeholder{color:var(--muted);}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;}
 .filter-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;}
-.filter-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-bg);}
+.filter-btn.active{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
+.filter-btn.da-f.active{border-color:var(--da);color:var(--da);background:var(--da-bg);}
+.filter-btn.lung-f.active{border-color:var(--lung);color:var(--lung);background:var(--lung-bg);}
 .table-wrap{padding:0 12px 110px;}
 .room-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:7px;overflow:hidden;}
 .room-card.is-arrived{border-left:3px solid var(--green);}
-.room-card.is-external{border-left:3px solid var(--gold);}
+.room-card.is-nodinner{border-left:3px solid var(--muted);opacity:.55;}
 .room-card.has-allergy{border-left:3px solid var(--red);}
+.room-card.is-da{border-left:3px solid var(--da);}
+.room-card.is-lung{border-left:3px solid var(--lung);}
 .card-main{display:flex;align-items:flex-start;padding:11px 14px;gap:11px;}
 .room-num{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;min-width:38px;padding-top:2px;}
 .guest-info{flex:1;min-width:0;}
@@ -86,24 +94,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-edit{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;flex-shrink:0;}
 .guest-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .pkg-badge{font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--muted);font-weight:700;}
-.pkg-badge.external{background:var(--gold-bg);border-color:rgba(245,158,11,.3);color:var(--gold);}
+.pkg-badge.fb{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.2);color:var(--amber);}
 .guest-count{font-size:12px;color:var(--muted);}
 .arr-time{font-family:'DM Mono',monospace;font-size:12px;color:var(--green);}
 .tag{display:inline-flex;align-items:center;gap:3px;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;margin-top:3px;margin-right:3px;}
 .tag.allergy{background:var(--red-bg);border:1px solid rgba(248,113,113,.25);color:var(--red);}
-.tag.paid-ext{background:var(--gold-bg);border:1px solid rgba(245,158,11,.25);color:var(--gold);}
+.tag.paid-bb{background:var(--amber-bg);border:1px solid rgba(251,191,36,.25);color:var(--amber);}
+.tag.da-blocked{background:var(--da-bg);border:1px solid rgba(249,115,22,.35);color:var(--da);}
+.tag.da-paid{background:var(--green-bg);border:1px solid rgba(52,211,153,.25);color:var(--green);}
+.tag.lungomare{background:var(--lung-bg);border:1px solid rgba(16,185,129,.3);color:var(--lung);}
 .card-actions{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
 .status-badge{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
 .status-badge.pending{background:var(--amber-bg);color:var(--amber);}
 .status-badge.arrived{background:var(--green-bg);color:var(--green);}
-.status-badge.external{background:var(--gold-bg);color:var(--gold);}
+.status-badge.nodinner{background:rgba(139,144,168,.1);color:var(--muted);}
+.status-badge.da-s{background:var(--da-bg);color:var(--da);}
+.status-badge.lung-s{background:var(--lung-bg);color:var(--lung);}
 .dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
 .dot.green{background:var(--green);}.dot.amber{background:var(--amber);animation:blink 1.5s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .btn-row{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
-.btn-checkin{background:var(--gold-bg);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:7px 13px;color:var(--gold);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
-.btn-ext{background:var(--gold-bg);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:7px 11px;color:var(--gold);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-checkin{background:var(--blue-bg);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:7px 13px;color:var(--blue);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn-bb{background:var(--amber-bg);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:7px 11px;color:var(--amber);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-da{background:var(--da-bg);border:1px solid rgba(249,115,22,.35);border-radius:7px;padding:7px 11px;color:var(--da);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-lung{background:var(--lung-bg);border:1px solid rgba(16,185,129,.3);border-radius:7px;padding:7px 11px;color:var(--lung);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
 .btn-undo{background:transparent;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;}
+.btn-nodinner{background:transparent;border:none;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:2px 4px;}
 .empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:14px;}
 /* REPORT */
 .report-wrap{padding:14px 14px 100px;}
@@ -111,25 +127,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .report-title{font-size:19px;font-weight:600;}.report-sub{font-size:12px;color:var(--muted);margin-top:2px;}
 .export-btn{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;}
 .section-title{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;padding-bottom:7px;border-bottom:1px solid var(--border);margin-bottom:10px;}
-.section-title.gold-sec{color:var(--gold);border-bottom-color:rgba(245,158,11,.3);}
+.section-title.da-sec{color:var(--da);border-bottom-color:rgba(249,115,22,.3);}
 .section-title.green-sec{color:var(--green);border-bottom-color:rgba(52,211,153,.3);}
 .report-section{margin-bottom:20px;}
 .sum-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
 .sum-row:last-child{border-bottom:none;}
 .sum-key{color:var(--muted);}.sum-val{font-weight:600;}
-.sum-val.green{color:var(--green);}.sum-val.amber{color:var(--amber);}.sum-val.red{color:var(--red);}.sum-val.blue{color:var(--blue);}.sum-val.gold{color:var(--gold);}
+.sum-val.green{color:var(--green);}.sum-val.amber{color:var(--amber);}.sum-val.red{color:var(--red);}.sum-val.blue{color:var(--blue);}.sum-val.da{color:var(--da);}
 .rev-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;}
 .rev-card{border-radius:var(--radius-lg);padding:14px 16px;border:1px solid;}
-.rev-card.ext-c{background:var(--gold-bg);border-color:rgba(245,158,11,.25);grid-column:1/-1;}
+.rev-card.bb-c{background:var(--amber-bg);border-color:rgba(251,191,36,.25);}
+.rev-card.da-c{background:var(--da-bg);border-color:rgba(249,115,22,.25);}
+.rev-card.tot-c{background:var(--green-bg);border-color:rgba(52,211,153,.25);grid-column:1/-1;}
 .rev-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:6px;}
-.rev-card.ext-c .rev-lbl{color:var(--gold);}
+.rev-card.bb-c .rev-lbl{color:var(--amber);}.rev-card.da-c .rev-lbl{color:var(--da);}.rev-card.tot-c .rev-lbl{color:var(--green);}
 .rev-amt{font-size:28px;font-weight:700;line-height:1;}
-.rev-card.ext-c .rev-amt{color:var(--gold);}
+.rev-card.bb-c .rev-amt{color:var(--amber);}.rev-card.da-c .rev-amt{color:var(--da);}.rev-card.tot-c .rev-amt{color:var(--green);}
 .rev-sub{font-size:11px;color:var(--muted);margin-top:4px;}
 .wave-outer{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;}
 .wave-bars{display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:5px;}
-.wave-bar{flex:1;background:rgba(245,158,11,.22);border-radius:3px 3px 0 0;min-height:3px;position:relative;cursor:default;}
-.wave-bar:hover{background:var(--gold);}
+.wave-bar{flex:1;background:rgba(96,165,250,.22);border-radius:3px 3px 0 0;min-height:3px;position:relative;cursor:default;}
+.wave-bar:hover{background:var(--blue);}
 .wave-tip{display:none;position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:3px 7px;font-size:10px;white-space:nowrap;color:var(--text);z-index:10;}
 .wave-bar:hover .wave-tip{display:block;}
 .wave-lbls{display:flex;gap:4px;}.wave-lbl{flex:1;font-size:8px;color:var(--muted);text-align:center;}
@@ -139,7 +157,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tl-room{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;min-width:32px;}
 .tl-name{font-size:12px;color:var(--muted);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .tl-tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;}
-.tl-tag.ext{background:var(--gold-bg);color:var(--gold);}
+.tl-tag.bb{background:var(--amber-bg);color:var(--amber);}.tl-tag.da{background:var(--da-bg);color:var(--da);}
 /* HISTORY */
 .history-wrap{padding:14px 14px 100px;}
 .history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
@@ -164,11 +182,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .import-title{font-size:19px;font-weight:600;margin-bottom:6px;}
 .import-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
 .drop-zone{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);}
-.drop-zone:hover,.drop-zone.drag-over{border-color:var(--gold);background:var(--gold-bg);}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:var(--blue-bg);}
 .drop-icon{font-size:40px;margin-bottom:12px;}
 .drop-title{font-size:15px;font-weight:600;margin-bottom:6px;}
 .drop-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
-.btn-browse{background:var(--gold);border:none;border-radius:var(--radius);padding:10px 22px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-browse{background:var(--blue);border:none;border-radius:var(--radius);padding:10px 22px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
 .import-result{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:none;}
 .import-result.show{display:block;}
 .import-result-title{font-size:14px;font-weight:600;margin-bottom:10px;}
@@ -193,16 +211,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .form-row select option{background:var(--surface);}
 .modal-btns{display:flex;gap:8px;margin-top:14px;}
 .btn-cancel{flex:1;background:transparent;border:1px solid var(--border2);border-radius:var(--radius);padding:10px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;}
-.btn-save{flex:2;border:none;border-radius:var(--radius);padding:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:var(--gold);}
+.btn-save{flex:2;border:none;border-radius:var(--radius);padding:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:var(--blue);}
+.btn-save.orange{background:var(--da);}
 /* PRINT */
 @media print{
   body{background:#fff!important;color:#000!important;}
   .header,.tab-bar,.fabs,#password-screen,#panel-board,#panel-report,#panel-history,#panel-import{display:none!important;}
   #panel-stats{display:block!important;}
   .print-hide{display:none!important;}
+  #stats-content,#manual-stats-content{background:#fff;color:#000;}
   canvas{max-width:100%;}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 }
+.btn-save.green{background:var(--lung);}
 .danger-zone{background:var(--red-bg);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 12px;margin-top:10px;}
 .danger-title{font-size:11px;color:var(--red);font-weight:700;margin-bottom:4px;}
 .danger-sub{font-size:11px;color:var(--muted);margin-bottom:8px;}
@@ -210,7 +231,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-danger{background:transparent;border:1px solid rgba(248,113,113,.3);border-radius:7px;padding:6px 10px;color:var(--red);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;}
 .fabs{position:fixed;bottom:20px;right:16px;display:flex;flex-direction:column;gap:10px;align-items:flex-end;z-index:50;}
 .fab{border:none;border-radius:50px;padding:13px 18px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 4px 18px rgba(0,0,0,.45);}
-.fab.gold{background:var(--gold);}
+.fab.blue{background:var(--blue);}.fab.orange{background:var(--da);}.fab.green{background:var(--lung);}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
@@ -224,18 +245,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .pw-title{font-size:18px;font-weight:600;color:#f0f2f8;margin-bottom:4px;}
 .pw-sub{font-size:13px;color:#8b90a8;margin-bottom:24px;}
 .pw-input{width:100%;background:#0f1117;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:12px 16px;color:#f0f2f8;font-family:'DM Sans',sans-serif;font-size:15px;text-align:center;letter-spacing:.15em;margin-bottom:12px;outline:none;}
-.pw-input:focus{border-color:#f59e0b;}
-.pw-btn{width:100%;background:#f59e0b;border:none;border-radius:10px;padding:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
-.pw-btn:hover{background:#d97706;}
+.pw-input:focus{border-color:#60a5fa;}
+.pw-btn{width:100%;background:#60a5fa;border:none;border-radius:10px;padding:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.pw-btn:hover{background:#3b82f6;}
 .pw-error{color:#f87171;font-size:12px;margin-top:8px;display:none;}
 .pw-error.show{display:block;}
 </style>
 
 <div id="password-screen">
   <div class="pw-box">
-    <div class="pw-logo">☀️</div>
+    <div class="pw-logo">🌙</div>
     <div class="pw-title">White Rocks Hotel</div>
-    <div class="pw-sub">Breakfast Buffet Board</div>
+    <div class="pw-sub">Dinner Buffet Board</div>
     <input type="password" class="pw-input" id="pw-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkPW()">
     <button class="pw-btn" onclick="checkPW()">Enter</button>
     <div class="pw-error" id="pw-error">Incorrect password</div>
@@ -245,7 +266,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div class="header">
   <div>
     <div class="hotel-name">White Rocks Hotel &amp; Bungalows</div>
-    <div class="page-title">&#9728; Breakfast Buffet Board</div>
+    <div class="page-title">🌙 Dinner Buffet Board</div>
   </div>
   <div style="text-align:right;">
     <div class="live-date" id="live-date"></div>
@@ -268,11 +289,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="stat-card"><div class="stat-label">Rooms</div><div class="stat-value" id="s-total">-</div></div>
     <div class="stat-card"><div class="stat-label">Arrived</div><div class="stat-value green" id="s-arrived">-</div></div>
     <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value amber" id="s-pending">-</div></div>
-    <div class="stat-card"><div class="stat-label">Guests in</div><div class="stat-value gold" id="s-guests">-</div></div>
+    <div class="stat-card"><div class="stat-label">Guests in</div><div class="stat-value blue" id="s-guests">-</div></div>
   </div>
   <div class="rem-banner">
     <div class="rem-info">
-      <div class="rem-title">Rooms still to arrive</div>
+      <div class="rem-title">Still to arrive</div>
       <div class="rem-count" id="rem-count">-</div>
       <div class="rem-sub" id="rem-sub"></div>
     </div>
@@ -288,7 +309,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
     <button class="filter-btn" id="f-pending" onclick="toggleFilter('pending')">Pending</button>
     <button class="filter-btn" id="f-arrived" onclick="toggleFilter('arrived')">Arrived</button>
-    <button class="filter-btn" id="f-ext" onclick="toggleFilter('ext')" style="color:var(--gold);">External</button>
+    <button class="filter-btn da-f" id="f-da" onclick="toggleFilter('da')" style="color:var(--da);">DA</button>
+    <button class="filter-btn lung-f" id="f-lung" onclick="toggleFilter('lung')" style="color:var(--lung);">&#127860; Lung.</button>
   </div>
   <div class="table-wrap" id="board-list"></div>
 </div>
@@ -306,7 +328,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button onclick="exportAllJSON()" style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 12px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#8659; JSON (All)</button>
         <button onclick="document.getElementById('import-json-input').click()" style="background:var(--surface);border:1px solid rgba(52,211,153,.3);border-radius:var(--radius);padding:8px 12px;color:var(--green);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#8679; Import JSON</button>
-        <button class="btn-save" style="flex:unset;padding:8px 14px;font-size:12px;background:var(--gold);border:none;border-radius:var(--radius);color:#fff;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;" onclick="saveToday()">&#128190; Save Now</button>
+        <button style="background:var(--blue);border:none;border-radius:var(--radius);padding:8px 14px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;" onclick="saveToday()">&#128190; Save Now</button>
       </div>
     </div>
     <input type="file" id="import-json-input" accept=".json" style="display:none" onchange="importJSONHistory(event)">
@@ -332,15 +354,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="import-title">&#8679; Import In-House List</div>
     <div class="import-sub">Επίλεξε τύπο αρχείου από το Protel.</div>
 
+    <!-- File type selector -->
     <div style="display:flex;gap:8px;margin-bottom:16px;">
-      <button id="itype-pdf" onclick="switchImportType('pdf')" style="flex:1;padding:10px;border:1px solid var(--gold);border-radius:var(--radius);background:var(--gold-bg);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128196; PDF</button>
+      <button id="itype-pdf" onclick="switchImportType('pdf')" style="flex:1;padding:10px;border:1px solid var(--blue);border-radius:var(--radius);background:var(--blue-bg);color:var(--blue);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128196; PDF</button>
       <button id="itype-chr" onclick="switchImportType('chr')" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128196; CHR / CSV</button>
     </div>
 
     <div class="drop-zone" id="drop-zone"
       ondragover="dropOver(event)" ondragleave="dropLeave(event)" ondrop="dropFile(event)"
       onclick="document.getElementById('file-input').click()">
-      <div class="drop-icon">&#9728;</div>
+      <div class="drop-icon">&#128196;</div>
       <div class="drop-title" id="drop-title">Drag &amp; drop το PDF εδώ</div>
       <div class="drop-sub">ή επίλεξε αρχείο</div>
       <button class="btn-browse" onclick="event.stopPropagation();document.getElementById('file-input').click()">&#128194; Browse file</button>
@@ -357,77 +380,63 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
   </div>
 </div>
-      <div class="drop-title">Drag &amp; drop το PDF εδώ</div>
-      <div class="drop-sub">ή επίλεξε αρχείο</div>
-      <button class="btn-browse" onclick="event.stopPropagation();document.getElementById('file-input').click()">&#128194; Browse file</button>
-    </div>
-    <input type="file" id="file-input" accept=".pdf,.txt" style="display:none" onchange="handleFile(event)">
-    <div class="import-result" id="import-result">
-      <div class="import-result-title" id="import-result-title"></div>
-      <div class="import-preview" id="import-preview"></div>
-      <div class="import-log" id="import-log"></div>
-      <div class="import-actions">
-        <button class="btn-import-cancel" onclick="cancelImport()">Cancel</button>
-        <button class="btn-import-confirm" onclick="confirmImport()">&#10003; Apply to Live Board</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- FABS -->
 <div class="fabs" id="fabs">
-  <button class="fab gold" onclick="openAddModal()">+ Add Guest</button>
+  <button class="fab green" onclick="openLungModal()">&#127860; Lungomare</button>
+  <button class="fab orange" onclick="openDAModal()">&#8635; Dine Around</button>
+  <button class="fab blue" onclick="openAddModal()">+ Add Room</button>
 </div>
 
 <!-- ADD MODAL -->
 <div class="modal-bg" id="add-modal">
   <div class="modal">
-    <h3>Add Guest</h3>
-    <div class="form-row"><label>Room / Name</label><input type="text" id="f-room" placeholder="Room number or EXT"></div>
+    <h3>Add Room</h3>
+    <div class="form-row"><label>Room number</label><input type="text" id="f-room" placeholder="e.g. 215"></div>
     <div class="form-row"><label>Guest name</label><input type="text" id="f-name" placeholder="e.g. SMITH"></div>
-    <div class="form-row"><label>Adults</label><input type="number" id="f-adults" min="0" max="20" value="2"></div>
-    <div class="form-row"><label>Type</label>
-      <select id="f-pkg">
-        <option value="HB">HB — Half Board (included)</option>
-        <option value="FB">FB — Full Board (included)</option>
-        <option value="BB">BB — Bed &amp; Breakfast (included)</option>
-        <option value="AI">AI — All Inclusive (included)</option>
-        <option value="EXT">External — Pay EUR 35/person</option>
-      </select>
-    </div>
+    <div class="form-row"><label>Adults</label><input type="number" id="f-adults" min="0" max="10" value="2"></div>
+    <div class="form-row"><label>Package</label><select id="f-pkg"><option value="HB">HB - Half Board</option><option value="FB">FB - Full Board</option><option value="BB">BB - Bed &amp; Breakfast</option><option value="AI">AI - All Inclusive</option></select></div>
     <div class="form-row"><label>Allergy / note</label><input type="text" id="f-allergy" placeholder="Optional"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('add-modal')">Cancel</button>
-      <button class="btn-save" onclick="addRoom()">Add</button>
-    </div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('add-modal')">Cancel</button><button class="btn-save" onclick="addRoom()">Add Room</button></div>
+  </div>
+</div>
+
+<!-- DA MODAL -->
+<div class="modal-bg" id="da-modal">
+  <div class="modal">
+    <h3 style="color:var(--da);">&#8635; Mark Dine Around</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">DA guests cannot enter unless they pay €50/person.</p>
+    <div class="form-row"><label>Room number</label><input type="text" id="da-room-input" placeholder="e.g. 215" oninput="daSearch()"></div>
+    <div id="da-match" style="margin-bottom:10px;min-height:44px;"></div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('da-modal')">Cancel</button><button class="btn-save orange" onclick="confirmDA()">Mark as DA</button></div>
+  </div>
+</div>
+
+<!-- LUNGOMARE MODAL -->
+<div class="modal-bg" id="lung-modal">
+  <div class="modal">
+    <h3 style="color:var(--lung);">&#127860; Lungomare Reservation</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Σήμανε δωμάτιο που έχει κράτηση στο Lungomare — δεν θα μετράει ως pending.</p>
+    <div class="form-row"><label>Room number</label><input type="text" id="lung-room-input" placeholder="e.g. 215" oninput="lungSearch()"></div>
+    <div id="lung-match" style="margin-bottom:10px;min-height:44px;"></div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('lung-modal')">Cancel</button><button class="btn-save green" onclick="confirmLung()">&#127860; Mark Lungomare</button></div>
   </div>
 </div>
 
 <!-- EDIT MODAL -->
 <div class="modal-bg" id="edit-modal">
   <div class="modal">
-    <h3>&#9998; Edit <span id="edit-room-lbl" style="color:var(--gold);font-family:'DM Mono',monospace;"></span></h3>
+    <h3>&#9998; Edit Room <span id="edit-room-lbl" style="color:var(--blue);font-family:'DM Mono',monospace;"></span></h3>
     <div class="form-row"><label>Guest name</label><input type="text" id="e-name"></div>
-    <div class="form-row"><label>Adults</label><input type="number" id="e-adults" min="0" max="20"></div>
-    <div class="form-row"><label>Type</label>
-      <select id="e-pkg">
-        <option value="HB">HB — Half Board</option>
-        <option value="FB">FB — Full Board</option>
-        <option value="BB">BB — Bed &amp; Breakfast</option>
-        <option value="AI">AI — All Inclusive</option>
-        <option value="EXT">External — EUR 35/person</option>
-      </select>
-    </div>
+    <div class="form-row"><label>Adults</label><input type="number" id="e-adults" min="0" max="10"></div>
+    <div class="form-row"><label>Package</label><select id="e-pkg"><option value="HB">HB</option><option value="FB">FB</option><option value="BB">BB</option><option value="AI">AI</option><option value="">—</option></select></div>
     <div class="form-row"><label>Allergy / note</label><input type="text" id="e-allergy"></div>
     <div class="danger-zone">
       <div class="danger-title">&#9888; Danger zone</div>
-      <div class="danger-sub">Undo check-in or payment.</div>
+      <div class="danger-sub">Undo check-in or payments.</div>
       <div class="danger-btns" id="danger-btns"></div>
     </div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('edit-modal')">Cancel</button>
-      <button class="btn-save" onclick="saveEdit()">Save</button>
-    </div>
+    <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('edit-modal')">Cancel</button><button class="btn-save" onclick="saveEdit()">Save</button></div>
   </div>
 </div>
 
@@ -435,10 +444,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div id="panel-stats" class="panel">
   <div style="padding:14px 14px 100px;">
     <div style="font-size:19px;font-weight:600;margin-bottom:16px;">&#128202; Statistics</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;">
-      <button id="stab-history" onclick="switchStatsTab('history')" style="flex:1;padding:10px;border:1px solid var(--gold);border-radius:var(--radius);background:var(--gold-bg);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128197; From History</button>
-      <button id="stab-manual" onclick="switchStatsTab('manual')" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#9998; Manual Entry</button>
+
+    <!-- Tabs inside stats -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button id="stab-history" onclick="switchStatsTab('history')" style="flex:1;min-width:80px;padding:10px;border:1px solid var(--blue);border-radius:var(--radius);background:var(--blue-bg);color:var(--blue);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128197; Daily</button>
+      <button id="stab-weekly" onclick="switchStatsTab('weekly')" style="flex:1;min-width:80px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128200; Weekly</button>
+      <button id="stab-manual" onclick="switchStatsTab('manual')" style="flex:1;min-width:80px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#9998; Manual</button>
     </div>
+
     <!-- FROM HISTORY -->
     <div id="stats-history-section">
       <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -446,41 +459,94 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <input type="date" id="stats-from" style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
         <span style="color:var(--muted);font-size:13px;">→</span>
         <input type="date" id="stats-to" style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
-        <button onclick="renderStats()" style="background:var(--gold);border:none;border-radius:var(--radius);padding:8px 16px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Show</button>
+        <button onclick="renderStats()" style="background:var(--blue);border:none;border-radius:var(--radius);padding:8px 16px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Show</button>
       </div>
-      <div id="stats-content"><div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">Select a date range and click Show</div></div>
+      <div id="stats-content">
+        <div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">Select a date range and click Show</div>
+      </div>
       <div id="stats-print-btn" style="display:none;margin-top:12px;">
         <button onclick="window.print()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">&#128438; Print / Save as PDF</button>
       </div>
     </div>
+
+    <!-- WEEKLY ANALYTICS -->
+    <div id="stats-weekly-section" style="display:none;">
+
+      <!-- Filter controls -->
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Filter by Month</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="month-filter-btns"></div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Select weeks to compare</div>
+        <div id="week-selector" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button onclick="selectAllWeeks()" style="flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:7px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;">Select All</button>
+          <button onclick="clearAllWeeks()" style="flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:7px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;">Clear</button>
+          <button onclick="renderWeeklyStats()" style="flex:2;background:var(--blue);border:none;border-radius:var(--radius);padding:7px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">&#128200; Compare</button>
+        </div>
+      </div>
+
+      <div id="weekly-content"><div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">Select weeks and click Compare</div></div>
+      <div id="weekly-print-btn" style="display:none;margin-top:12px;">
+        <button onclick="window.print()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">&#128438; Print / Save as PDF</button>
+      </div>
+    </div>
+
     <!-- MANUAL ENTRY -->
     <div id="stats-manual-section" style="display:none;">
       <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Πρόσθεσε δεδομένα από χαρτί για παλιές μέρες.</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Πρόσθεσε δεδομένα από χαρτί για παλιές μέρες. Θα συμπεριληφθούν στα γραφήματα.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Date</label><input type="date" id="me-date" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
-          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total rooms</label><input type="number" id="me-total" min="0" placeholder="e.g. 140" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
-          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Rooms arrived</label><input type="number" id="me-arrived" min="0" placeholder="e.g. 120" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
-          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Guests served</label><input type="number" id="me-guests" min="0" placeholder="e.g. 240" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
-          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">External revenue (€)</label><input type="number" id="me-extrev" min="0" placeholder="e.g. 70" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
-          <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Peak hour</label>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Date</label>
+            <input type="date" id="me-date" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total HB rooms</label>
+            <input type="number" id="me-total" min="0" placeholder="e.g. 120" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Rooms arrived</label>
+            <input type="number" id="me-arrived" min="0" placeholder="e.g. 98" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Total guests served</label>
+            <input type="number" id="me-guests" min="0" placeholder="e.g. 190" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">BB dinner revenue (€)</label>
+            <input type="number" id="me-bbrev" min="0" placeholder="e.g. 300" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">DA revenue (€)</label>
+            <input type="number" id="me-darev" min="0" placeholder="e.g. 150" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Peak hour</label>
             <select id="me-peak" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
               <option value="">— Select —</option>
-              <option>07:00</option><option>07:30</option><option>08:00</option><option>08:30</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option>
+              <option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option>
             </select>
           </div>
-          <div style="grid-column:1/-1;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Notes (optional)</label><input type="text" id="me-notes" placeholder="e.g. Full house" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;"></div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;">Notes (optional)</label>
+            <input type="text" id="me-notes" placeholder="e.g. Full house, wedding group" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;">
+          </div>
         </div>
-        <button onclick="addManualEntry()" style="width:100%;background:var(--gold);border:none;border-radius:var(--radius);padding:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">+ Add Entry</button>
+        <button onclick="addManualEntry()" style="width:100%;background:var(--blue);border:none;border-radius:var(--radius);padding:11px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">+ Add Entry</button>
       </div>
+
+      <!-- Saved manual entries -->
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:10px;">Saved entries</div>
       <div id="manual-entries-list"></div>
-      <button onclick="renderManualStats()" class="print-hide" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;">&#128202; Show Stats from Manual Entries</button>
+
+      <!-- Show stats from manual -->
+      <button onclick="renderManualStats()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;" class="print-hide">&#128202; Show Stats from Manual Entries</button>
       <div id="manual-stats-content" style="margin-top:16px;"></div>
       <div id="manual-print-btn" style="display:none;margin-top:12px;">
         <button onclick="window.print()" style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">&#128438; Print / Save as PDF</button>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -502,18 +568,19 @@ function checkPW(){
     document.getElementById('pw-input').focus();
   }
 }
+// Check if already authenticated this session
 if(sessionStorage.getItem('wr_auth')==='1'){
   document.getElementById('password-screen').classList.add('hidden');
 } else {
   setTimeout(()=>document.getElementById('pw-input').focus(), 100);
 }
 
+// TODAY is dynamic — uses current date automatically
 const TODAY = new Date().toISOString().split('T')[0];
-const LS_HISTORY = 'wr_breakfast_history';
-const FB_PATH = 'breakfast/current'; // Stable path — only changes on import
-const EXT_PRICE = 35;
+const LS_HISTORY = 'wr_dinner_history';
+const FB_PATH = 'dinner/' + TODAY;
 
-let guests=[], filterMode=null, editIdx=null, importedRooms=[];
+let guests=[], filterMode=null, editIdx=null, daIdx=null, lungIdx=null, importedRooms=[];
 let fbConnected=false, saveDebounce=null;
 
 function pad(n){return String(n).padStart(2,'0');}
@@ -528,6 +595,7 @@ function initFirebase(){
   setSyncBadge('connecting','Connecting...');
   window._fbListen(FB_PATH, (data)=>{
     if(data && Array.isArray(data.guests) && data.guests.length > 0){
+      // Only update if incoming data is newer or different
       if(JSON.stringify(data.guests) !== JSON.stringify(guests)){
         guests=data.guests;
         render();renderReport(guests);
@@ -556,11 +624,12 @@ function pushToFirebase(){
   },800);
 }
 
+// Save today to BOTH Firebase and localStorage
 function saveToday(silent){
   const entry={date:TODAY,savedAt:nowTime(),guests:JSON.parse(JSON.stringify(guests))};
   // Save to Firebase history
   if(fbConnected){
-    window._fbSet('breakfast_history/'+TODAY, entry)
+    window._fbSet('dinner_history/'+TODAY, entry)
       .catch(e=>console.error('History save error:',e));
   }
   // Also save locally as backup
@@ -576,18 +645,23 @@ function saveToday(silent){
 
 function getLocalHistory(){try{return JSON.parse(localStorage.getItem(LS_HISTORY)||'{}');}catch(e){return {};}}
 
+// getHistory now merges Firebase + localStorage
 let _fbHistory={};
 function getHistory(){
+  // Merge Firebase history with local history
   const local=getLocalHistory();
   return Object.assign({},local,_fbHistory);
 }
 
 function initFirebaseHistory(){
   if(!window._fbReady) return;
-  window._fbListen('breakfast_history',(data)=>{
+  // Listen to full history from Firebase
+  window._fbListen('dinner_history',(data)=>{
     if(data&&typeof data==='object'){
       _fbHistory=data;
+      // Also cache locally
       localStorage.setItem(LS_HISTORY,JSON.stringify(Object.assign(getLocalHistory(),data)));
+      // Re-render history if tab is open
       if(document.getElementById('panel-history').classList.contains('active')){
         renderHistory();
       }
@@ -601,11 +675,11 @@ function init(){
   initFirebaseHistory();
   startAutoSave();
 }
-
 function startAutoSave(){
+  // Check every minute for 22:00
   setInterval(()=>{
     const d=new Date();
-    if(d.getHours()===10&&d.getMinutes()===30) saveToday(false);
+    if(d.getHours()===22&&d.getMinutes()===0) saveToday(false);
   },60000);
 
   // Save when user closes/refreshes the page
@@ -613,28 +687,30 @@ function startAutoSave(){
     if(guests&&guests.length>0) saveToday(true);
   });
 
-  // Save when tab becomes hidden
+  // Save when tab becomes hidden (phone locks, switches app etc)
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden&&guests&&guests.length>0) saveToday(true);
   });
 
-  // Check if yesterday was saved
+  // Check if yesterday was saved — if not, try to save it now
   checkMissedDays();
 }
 
 function checkMissedDays(){
+  // Wait for Firebase to load history first
   setTimeout(()=>{
     const h=getHistory();
     const yesterday=new Date();
     yesterday.setDate(yesterday.getDate()-1);
     const yDate=yesterday.toISOString().split('T')[0];
+    // If yesterday not in history and we have guests data, warn user
     if(!h[yDate]){
       const badge=document.getElementById('autosave-badge');
       badge.textContent='⚠ Yesterday not saved — press Save Now';
       badge.style.color='var(--amber)';
       badge.classList.add('show');
     }
-  },5000);
+  },5000); // Wait 5s for Firebase to load
 }
 
 // ══════════════════════════════════════════════
@@ -659,16 +735,22 @@ function showTab(name,btn){
   if(name==='report')renderReport(guests);
   if(name==='history')renderHistory();
   if(name==='stats'){
-    const today=new Date(), weekAgo=new Date(today);
+    // Initialize stats tab properly
+    switchStatsTab('history');
+    // Set default date range — last 7 days
+    const today = new Date();
+    const weekAgo = new Date(today);
     weekAgo.setDate(weekAgo.getDate()-6);
-    if(!document.getElementById('stats-from').value) document.getElementById('stats-from').value=weekAgo.toISOString().split('T')[0];
-    if(!document.getElementById('stats-to').value) document.getElementById('stats-to').value=today.toISOString().split('T')[0];
+    if(!document.getElementById('stats-from').value)
+      document.getElementById('stats-from').value = weekAgo.toISOString().split('T')[0];
+    if(!document.getElementById('stats-to').value)
+      document.getElementById('stats-to').value = today.toISOString().split('T')[0];
     renderStats();
   }
 }
 function toggleFilter(m){
   filterMode=filterMode===m?null:m;
-  ['pending','arrived','ext'].forEach(x=>document.getElementById('f-'+x).classList.toggle('active',filterMode===x));
+  ['pending','arrived','da','lung'].forEach(x=>document.getElementById('f-'+x).classList.toggle('active',filterMode===x));
   render();
 }
 
@@ -677,84 +759,118 @@ function toggleFilter(m){
 // ══════════════════════════════════════════════
 function render(){
   const q=document.getElementById('search-input').value.trim().toLowerCase();
-  const list=guests.filter(g=>{
-    if(q&&!g.room.includes(q)&&!g.name.toLowerCase().includes(q))return false;
-    if(filterMode==='pending')return !g.arrived;
-    if(filterMode==='arrived')return g.arrived;
-    if(filterMode==='ext')return g.pkg==='EXT';
-    return true;
-  }).sort((a,b)=>a.room.localeCompare(b.room,undefined,{numeric:true}));
 
-  const arrived=guests.filter(g=>g.arrived);
-  const pending=guests.filter(g=>!g.arrived);
+  // Dinner rooms = HB/FB/AI (not BB, not adults=0)
+  const dinnerG=guests.filter(g=>!g.noDinner);
+  const arrived=dinnerG.filter(g=>g.arrived);
   const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
-  const pct=guests.length?Math.round((arrived.length/guests.length)*100):0;
+
+  // Truly pending = dinner rooms that haven't arrived AND are not DA or Lungomare
+  const trulyPending=dinnerG.filter(g=>!g.arrived&&!g.dineAround&&!g.lungomare);
+  const daCount=dinnerG.filter(g=>!g.arrived&&g.dineAround).length;
+  const lungCount=dinnerG.filter(g=>!g.arrived&&g.lungomare).length;
+
+  // Progress = arrived / (arrived + truly pending) — excluding DA and Lungomare
+  const forProgress=arrived.length+trulyPending.length;
+  const pct=forProgress>0?Math.round((arrived.length/forProgress)*100):0;
 
   document.getElementById('s-total').textContent=guests.length;
   document.getElementById('s-arrived').textContent=arrived.length;
-  document.getElementById('s-pending').textContent=pending.length;
+  document.getElementById('s-pending').textContent=trulyPending.length;
   document.getElementById('s-guests').textContent=served;
-  document.getElementById('rem-count').textContent=pending.length;
-  document.getElementById('rem-sub').textContent=pending.length===0?'All rooms accounted for!':pending.length+' room'+(pending.length>1?'s':'')+' expected';
+  document.getElementById('rem-count').textContent=trulyPending.length;
+
+  let subParts=[];
+  if(trulyPending.length>0) subParts.push(trulyPending.length+' room'+(trulyPending.length>1?'s':'')+' still to come');
+  if(daCount>0) subParts.push(daCount+' DA');
+  if(lungCount>0) subParts.push(lungCount+' Lungomare');
+  document.getElementById('rem-sub').textContent=trulyPending.length===0&&daCount===0&&lungCount===0?'All rooms accounted for!':subParts.join(' · ');
+
   document.getElementById('prog-fill').style.width=pct+'%';
   document.getElementById('prog-pct').textContent=pct+'% attended';
 
+  const list=guests.filter(g=>{
+    if(q&&!g.room.includes(q)&&!g.name.toLowerCase().includes(q))return false;
+    if(filterMode==='pending')return !g.arrived&&!g.noDinner&&!(g.dineAround&&!g.daPaid)&&!g.lungomare;
+    if(filterMode==='arrived')return g.arrived;
+    if(filterMode==='da')return g.dineAround;
+    if(filterMode==='lung')return g.lungomare;
+    return true;
+  }).sort((a,b)=>a.room.localeCompare(b.room,undefined,{numeric:true}));
+
   const el=document.getElementById('board-list');
-  if(!list.length){el.innerHTML='<div class="empty">No guests yet. Import the PDF or add manually.</div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty">No rooms match.</div>';return;}
 
   el.innerHTML=list.map(g=>{
     const i=guests.indexOf(g);
-    const isExt=g.pkg==='EXT';
+    const isBB=g.pkg==='BB';
     const hasA=g.allergy&&g.allergy.length>0;
+    const daBlocked=g.dineAround&&!g.daPaid;
+    const daEntered=g.dineAround&&g.daPaid;
     const adults=Number(g.adults)||0;
 
     let cls='room-card';
-    if(hasA&&!g.arrived)cls+=' has-allergy';
+    if(g.lungomare&&!g.arrived)cls+=' is-lung';
+    else if(daBlocked)cls+=' is-da';
+    else if(hasA&&!g.noDinner&&!g.arrived)cls+=' has-allergy';
     else if(g.arrived)cls+=' is-arrived';
-    else if(isExt&&!g.paidExt)cls+=' is-external';
+    else if(g.noDinner)cls+=' is-nodinner';
 
     let badge;
-    if(isExt&&!g.paidExt)badge='<span class="status-badge external">&#9888; External</span>';
-    else if(g.arrived)badge='<span class="status-badge arrived"><span class="dot green"></span> Arrived</span>';
+    if(g.lungomare&&!g.arrived) badge='<span class="status-badge lung-s">&#127860; Lungomare</span>';
+    else if(daBlocked) badge='<span class="status-badge da-s">&#8635; Dine Around</span>';
+    else if(g.noDinner) badge=isBB?'<span class="status-badge nodinner"><span class="dot" style="background:var(--muted)"></span> B&amp;B</span>':'<span class="status-badge nodinner"><span class="dot" style="background:var(--muted)"></span> No dinner</span>';
+    else if(g.arrived) badge='<span class="status-badge arrived"><span class="dot green"></span> Arrived</span>';
     else badge='<span class="status-badge pending"><span class="dot amber"></span> Pending</span>';
 
-    let btns;
-    if(isExt&&!g.paidExt){
-      btns=`<div class="btn-row">
-        <button class="btn-ext" onclick="act('extPay',${i})">Pay EUR${EXT_PRICE*adults} &amp; Enter</button>
-      </div>`;
-    } else if(g.arrived){
-      const uExt=g.paidExt?`<button class="btn-undo" onclick="act('undoExtPay',${i})">Undo EUR${EXT_PRICE*adults}</button>`:'';
-      btns=`<div class="btn-row"><button class="btn-undo" onclick="act('undoArrival',${i})">Undo check-in</button>${uExt}</div>`;
-    } else if(isExt&&g.paidExt){
+    let btns='';
+    if(g.lungomare&&!g.arrived){
       btns=`<div class="btn-row">
         <button class="btn-checkin" onclick="act('checkIn',${i})">Check in</button>
-        <button class="btn-undo" onclick="act('undoExtPay',${i})">Undo EUR${EXT_PRICE*adults}</button>
+        <button class="btn-undo" onclick="act('undoLung',${i})">Remove</button>
       </div>`;
+    } else if(daBlocked){
+      btns=`<div class="btn-row">
+        <button class="btn-da" onclick="act('daPayEnter',${i})">Pay €${50*adults} &amp; Enter</button>
+        <button class="btn-undo" onclick="act('undoDA',${i})">Remove DA</button>
+      </div>`;
+    } else if(g.noDinner&&isBB){
+      btns=`<div class="btn-row"><button class="btn-bb" onclick="act('bbPay',${i})">+ Dinner €${50*adults}</button></div>`;
+    } else if(g.noDinner){
+      btns=`<button class="btn-undo" onclick="act('undoNoDinner',${i})">Undo</button>`;
+    } else if(g.arrived){
+      const uBB=g.paidDinner?`<button class="btn-undo" onclick="act('undoBBPay',${i})">Undo BB</button>`:'';
+      const uDA=g.daPaid?`<button class="btn-undo" onclick="act('undoDAPay',${i})">Undo DA</button>`:'';
+      const uLung=g.lungomare?`<button class="btn-undo" onclick="act('undoLung',${i})">Remove Lung.</button>`:'';
+      btns=`<div class="btn-row"><button class="btn-undo" onclick="act('undoArrival',${i})">Undo check-in</button>${uBB}${uDA}${uLung}</div>`;
+    } else if(g.paidDinner){
+      btns=`<div class="btn-row"><button class="btn-checkin" onclick="act('checkIn',${i})">Check in</button><button class="btn-undo" onclick="act('undoBBPay',${i})">Undo €${50*adults}</button></div>`;
+    } else if(daEntered){
+      btns=`<div class="btn-row"><button class="btn-checkin" onclick="act('checkIn',${i})">Check in</button><button class="btn-undo" onclick="act('undoDAPay',${i})">Undo €${50*adults}</button></div>`;
     } else {
-      btns=`<div class="btn-row"><button class="btn-checkin" onclick="act('checkIn',${i})">Check in</button></div>`;
+      const ndl=!isBB?`<button class="btn-nodinner" onclick="act('markNoDinner',${i})">no dinner</button>`:'';
+      btns=`<div class="btn-row"><button class="btn-checkin" onclick="act('checkIn',${i})">Check in</button>${ndl}</div>`;
     }
 
-    const pkgCls=isExt?'pkg-badge external':'pkg-badge';
-    const aTag=hasA?`<div class="tag allergy">&#9888; ${g.allergy}</div>`:'';
-    const extTag=g.paidExt?`<div class="tag paid-ext">&#9728; Paid EUR${EXT_PRICE*adults}</div>`:'';
+    const pkgCls=g.pkg==='FB'||g.pkg==='AI'?'pkg-badge fb':'pkg-badge';
+    const aTag=hasA&&!g.noDinner?`<div class="tag allergy">&#9888; ${g.allergy}</div>`:'';
+    const bbTag=g.paidDinner?`<div class="tag paid-bb">BB €${50*adults}</div>`:'';
+    const daTag=g.dineAround?(daBlocked?'<div class="tag da-blocked">&#8635; DA BLOCKED</div>':'<div class="tag da-paid">&#8635; DA Paid</div>'):'';
+    const lungTag=g.lungomare?'<div class="tag lungomare">&#127860; Lungomare</div>':'';
     const time=g.arrived&&g.arrivalTime?`<span class="arr-time">${g.arrivalTime}</span>`:'';
 
     return `<div class="${cls}"><div class="card-main">
       <div class="room-num">${g.room}</div>
       <div class="guest-info">
         <div class="name-row"><div class="guest-name">${g.name}</div><button class="btn-edit" onclick="openEdit(${i})">&#9998;</button></div>
-        <div class="guest-meta">
-          <span class="${pkgCls}">${g.pkg}</span>
-          <span class="guest-count">${adults>0?adults+' adult'+(adults>1?'s':''):''}</span>
-          ${time}
-        </div>
-        ${aTag}${extTag}
+        <div class="guest-meta">${g.pkg?`<span class="${pkgCls}">${g.pkg}</span>`:''}<span class="guest-count">${adults>0?adults+' adult'+(adults>1?'s':''):''}</span>${time}</div>
+        ${aTag}${bbTag}${daTag}${lungTag}
       </div>
       <div class="card-actions">${badge}${btns}</div>
     </div></div>`;
   }).join('');
 
+  localStorage.setItem('wr_dinner_render_'+TODAY, JSON.stringify(guests));
   pushToFirebase();
 }
 
@@ -762,19 +878,17 @@ function render(){
 // ACTIONS
 // ══════════════════════════════════════════════
 function act(action,i){
-  const g=guests[i],adults=Number(g.adults)||0,cost=EXT_PRICE*adults;
+  const g=guests[i],adults=Number(g.adults)||0,cost=50*adults;
   if(action==='checkIn'){guests[i].arrived=true;guests[i].arrivalTime=nowTime();}
   else if(action==='undoArrival'){guests[i].arrived=false;guests[i].arrivalTime='';}
-  else if(action==='extPay'){
-    if(!confirm(`Confirm external breakfast charge\nRoom ${g.room} - ${g.name}\n${adults} x EUR${EXT_PRICE} = EUR${cost}`))return;
-    guests[i].paidExt=true;
-  }
-  else if(action==='undoExtPay'){
-    if(!confirm(`Remove external charge for ${g.name}?`))return;
-    guests[i].paidExt=false;
-    guests[i].arrived=false;
-    guests[i].arrivalTime='';
-  }
+  else if(action==='markNoDinner'){guests[i].noDinner=true;}
+  else if(action==='undoNoDinner'){guests[i].noDinner=false;guests[i].paidDinner=false;}
+  else if(action==='bbPay'){if(!confirm(`BB dinner\nRoom ${g.room} - ${g.name}\n${adults} x €50 = €${cost}`))return;guests[i].noDinner=false;guests[i].paidDinner=true;}
+  else if(action==='undoBBPay'){if(!confirm(`Remove BB charge for Room ${g.room}?`))return;guests[i].paidDinner=false;guests[i].noDinner=true;}
+  else if(action==='daPayEnter'){if(!confirm(`DA supplement\nRoom ${g.room} - ${g.name}\n${adults} x €50 = €${cost}`))return;guests[i].daPaid=true;guests[i].noDinner=false;}
+  else if(action==='undoDA'){if(!confirm(`Remove DA from Room ${g.room}?`))return;guests[i].dineAround=false;guests[i].daPaid=false;}
+  else if(action==='undoDAPay'){if(!confirm(`Undo DA payment for Room ${g.room}?`))return;guests[i].daPaid=false;guests[i].dineAround=true;}
+  else if(action==='undoLung'){if(!confirm(`Remove Lungomare from Room ${g.room}?`))return;guests[i].lungomare=false;}
   render();
 }
 
@@ -782,82 +896,110 @@ function act(action,i){
 // REPORT
 // ══════════════════════════════════════════════
 function buildReportHTML(data, dateLabel){
-  const arrived=data.filter(g=>g.arrived).sort((a,b)=>(a.arrivalTime||'').localeCompare(b.arrivalTime||''));
-  const pending=data.filter(g=>!g.arrived);
-  const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
-  const rate=data.length?Math.round((arrived.length/data.length)*100):0;
-  const paidExtList=data.filter(g=>g.paidExt);
-  const extRev=paidExtList.reduce((s,g)=>s+(Number(g.adults)||0)*EXT_PRICE,0);
-  const al=data.filter(g=>g.allergy&&g.allergy.length>0);
+  const dinnerG=data.filter(g=>!g.noDinner);
+  const arrived=dinnerG.filter(g=>g.arrived).sort((a,b)=>(a.arrivalTime||'').localeCompare(b.arrivalTime||''));
+  const absent=dinnerG.filter(g=>!g.arrived&&!g.lungomare&&!(g.dineAround&&!g.daPaid));
+  const noDinner=data.filter(g=>g.noDinner);
+  const lungList=data.filter(g=>g.lungomare&&!g.arrived);
 
-  const slots=['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00'];
+  // DA breakdown
+  const daAll=data.filter(g=>g.dineAround);
+  const daBlocked=daAll.filter(g=>!g.daPaid); // marked DA, did NOT pay = went to Lungomare/elsewhere
+  const daPaid=daAll.filter(g=>g.daPaid);     // marked DA, DID pay = came to buffet
+
+  const rate=dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
+  const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
+  const paidBBList=data.filter(g=>g.paidDinner);
+  const bbRev=paidBBList.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+  const daRev=daPaid.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+  const al=data.filter(g=>g.allergy&&g.allergy.length>0);
+  const first=arrived[0]?.arrivalTime||'-',last=arrived[arrived.length-1]?.arrivalTime||'-';
+  const avg=arrived.length?(served/arrived.length).toFixed(1):'-';
+
+  const slots=['18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00'];
   const counts=slots.map(s=>{
     const [h,m]=s.split(':').map(Number);
     return arrived.filter(g=>{
       if(!g.arrivalTime)return false;
       const [gh,gm]=g.arrivalTime.split(':').map(Number);
-      const t=gh*60+gm,st=h*60+m;
-      return t>=st&&t<st+30;
+      return gh*60+gm>=h*60+m&&gh*60+gm<h*60+m+30;
     }).length;
   });
   const maxC=Math.max(...counts,1);
-  const first=arrived[0]?.arrivalTime||'-',last=arrived[arrived.length-1]?.arrivalTime||'-';
-  const avg=arrived.length?(served/arrived.length).toFixed(1):'-';
 
   return `
     <div class="report-top">
-      <div><div class="report-title">&#9728; Breakfast Report</div><div class="report-sub">${dateLabel}</div></div>
+      <div><div class="report-title">Manager Report</div><div class="report-sub">${dateLabel}</div></div>
       <button class="export-btn" onclick='exportData(${JSON.stringify(data).replace(/'/g,"&#39;")}, "${dateLabel}")'>&#8659; Export</button>
     </div>
     <div class="stats-row" style="padding:0 0 16px;">
-      <div class="stat-card"><div class="stat-label">Total rooms</div><div class="stat-value">${data.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Arrived</div><div class="stat-value green">${arrived.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Rate</div><div class="stat-value gold">${rate}%</div></div>
+      <div class="stat-card"><div class="stat-label">In-house</div><div class="stat-value">${data.length}</div></div>
+      <div class="stat-card"><div class="stat-label">At dinner</div><div class="stat-value green">${arrived.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Rate</div><div class="stat-value blue">${rate}%</div></div>
       <div class="stat-card"><div class="stat-label">Guests served</div><div class="stat-value">${served}</div></div>
     </div>
+
     <div class="report-section">
-      <div class="section-title green-sec">&#128176; Revenue — External guests</div>
+      <div class="section-title green-sec">&#128176; Revenue breakdown</div>
       <div class="rev-cards">
-        <div class="rev-card ext-c">
-          <div class="rev-lbl">External Breakfast Charges</div>
-          <div class="rev-amt">EUR ${extRev}</div>
-          <div class="rev-sub">${paidExtList.length} external guest${paidExtList.length!==1?'s':''} &middot; EUR${EXT_PRICE}/person</div>
-        </div>
+        <div class="rev-card bb-c"><div class="rev-lbl">BB Dinner</div><div class="rev-amt">€${bbRev}</div><div class="rev-sub">${paidBBList.length} room${paidBBList.length!==1?'s':''} · €50/person</div></div>
+        <div class="rev-card da-c"><div class="rev-lbl">Dine Around (paid buffet)</div><div class="rev-amt">€${daRev}</div><div class="rev-sub">${daPaid.length} of ${daAll.length} DA rooms</div></div>
+        <div class="rev-card tot-c"><div class="rev-lbl">Total supplement revenue</div><div class="rev-amt">€${bbRev+daRev}</div><div class="rev-sub">BB €${bbRev} + DA €${daRev}</div></div>
       </div>
     </div>
+
     <div class="report-section">
-      <div class="section-title">Arrival wave — 30-min slots</div>
+      <div class="section-title da-sec">&#8635; Dine Around breakdown</div>
+      <div class="sum-row"><span class="sum-key">Total DA rooms marked</span><span class="sum-val">${daAll.length}</span></div>
+      <div class="sum-row"><span class="sum-key" style="color:var(--green);">✓ DA — Ήρθαν &amp; πλήρωσαν buffet</span><span class="sum-val green">${daPaid.length} room${daPaid.length!==1?'s':''}</span></div>
+      <div class="sum-row"><span class="sum-key" style="color:var(--da);">✗ DA — Δεν ήρθαν (Lungomare/αλλού)</span><span class="sum-val da">${daBlocked.length} room${daBlocked.length!==1?'s':''}</span></div>
+      ${daPaid.length?daPaid.map(g=>`<div class="sum-row" style="padding-left:12px;"><span class="sum-key">Room ${g.room} — ${g.name}</span><span class="sum-val green">Paid €${Number(g.adults)*50}</span></div>`).join(''):''}
+      ${daBlocked.length?daBlocked.map(g=>`<div class="sum-row" style="padding-left:12px;"><span class="sum-key">Room ${g.room} — ${g.name}</span><span class="sum-val da">Did not come</span></div>`).join(''):''}
+    </div>
+
+    ${lungList.length?`<div class="report-section">
+      <div class="section-title" style="color:var(--lung);border-bottom-color:rgba(16,185,129,.3);">&#127860; Lungomare reservations tonight</div>
+      ${lungList.map(g=>`<div class="sum-row"><span class="sum-key">Room ${g.room} — ${g.name}</span><span class="sum-val" style="color:var(--lung);">Lungomare</span></div>`).join('')}
+    </div>`:''}
+
+    <div class="report-section">
+      <div class="section-title">Arrival wave</div>
       <div class="wave-outer">
         <div class="wave-bars">${counts.map((c,i)=>'<div class="wave-bar" style="height:'+Math.max(4,Math.round((c/maxC)*76))+'px;"><div class="wave-tip">'+slots[i]+': '+c+' room'+(c!==1?'s':'')+'</div></div>').join('')}</div>
         <div class="wave-lbls">${slots.map(s=>'<div class="wave-lbl">'+s+'</div>').join('')}</div>
       </div>
     </div>
+
     <div class="report-section">
       <div class="section-title">Arrival timeline</div>
       <div class="timeline">
-        ${arrived.length?arrived.map(g=>{const a=Number(g.adults)||0;return'<div class="tl-item"><span class="tl-time">'+g.arrivalTime+'</span><span class="tl-room">'+g.room+'</span><span class="tl-name">'+g.name+'</span>'+(g.paidExt?'<span class="tl-tag ext">EXT +EUR'+(a*EXT_PRICE)+'</span>':'')+'<span style="font-size:11px;color:var(--muted);">'+a+' pax</span></div>';}).join(''):'<div style="color:var(--muted);font-size:13px;padding:6px 0;">No arrivals yet.</div>'}
+        ${arrived.length?arrived.map(g=>{const a=Number(g.adults)||0;return`<div class="tl-item"><span class="tl-time">${g.arrivalTime}</span><span class="tl-room">${g.room}</span><span class="tl-name">${g.name}</span>${g.paidDinner?`<span class="tl-tag bb">BB +€${a*50}</span>`:''}${g.daPaid?`<span class="tl-tag da">DA +€${a*50}</span>`:''}<span style="font-size:11px;color:var(--muted);">${a} pax</span></div>`;}).join(''):'<div style="color:var(--muted);font-size:13px;padding:6px 0;">No arrivals yet.</div>'}
       </div>
     </div>
+
     <div class="report-section">
       <div class="section-title">Statistics</div>
-      <div class="sum-row"><span class="sum-key">Total rooms</span><span class="sum-val">${data.length}</span></div>
+      <div class="sum-row"><span class="sum-key">Rooms expected at dinner</span><span class="sum-val">${dinnerG.length}</span></div>
       <div class="sum-row"><span class="sum-key">Rooms arrived</span><span class="sum-val green">${arrived.length}</span></div>
-      <div class="sum-row"><span class="sum-key">Not yet arrived</span><span class="sum-val amber">${pending.length}</span></div>
-      <div class="sum-row"><span class="sum-key">External paying guests</span><span class="sum-val gold">${paidExtList.length}</span></div>
-      <div class="sum-row"><span class="sum-key">Total guests served</span><span class="sum-val blue">${served}</span></div>
-      <div class="sum-row"><span class="sum-key">Avg pax per room</span><span class="sum-val">${avg}</span></div>
+      <div class="sum-row"><span class="sum-key">Not yet arrived</span><span class="sum-val amber">${absent.length}</span></div>
+      <div class="sum-row"><span class="sum-key">At Lungomare</span><span class="sum-val" style="color:var(--lung);">${lungList.length}</span></div>
+      <div class="sum-row"><span class="sum-key">No dinner / BB</span><span class="sum-val">${noDinner.length}</span></div>
+      <div class="sum-row"><span class="sum-key">Guests served</span><span class="sum-val blue">${served}</span></div>
+      <div class="sum-row"><span class="sum-key">Avg pax/room</span><span class="sum-val">${avg}</span></div>
       <div class="sum-row"><span class="sum-key">First arrival</span><span class="sum-val">${first}</span></div>
       <div class="sum-row"><span class="sum-key">Last arrival</span><span class="sum-val">${last}</span></div>
       <div class="sum-row"><span class="sum-key">Attendance rate</span><span class="sum-val ${rate>=80?'green':rate>=60?'amber':'red'}">${rate}%</span></div>
     </div>
-    ${al.length?`<div class="report-section"><div class="section-title">Allergy &amp; dietary notes</div>${al.map(g=>'<div class="sum-row"><span class="sum-key">Room '+g.room+' - '+g.name+'</span><span class="sum-val red" style="font-size:11px;max-width:55%;text-align:right;">'+g.allergy+'</span></div>').join('')}</div>`:''}
-    ${pending.length?`<div class="report-section"><div class="section-title">Not yet arrived</div>${pending.map(g=>'<div class="sum-row"><span class="sum-key">Room '+g.room+' - '+g.name+'</span><span class="sum-val" style="font-size:12px;color:var(--muted);">'+Number(g.adults)+' adult'+(Number(g.adults)>1?'s':'')+'</span></div>').join('')}</div>`:''}
+
+    ${al.length?`<div class="report-section"><div class="section-title">Allergy &amp; dietary notes</div>${al.map(g=>`<div class="sum-row"><span class="sum-key">Room ${g.room} — ${g.name}</span><span class="sum-val red" style="font-size:11px;max-width:55%;text-align:right;">${g.allergy}</span></div>`).join('')}</div>`:''}
+
+    ${absent.length?`<div class="report-section"><div class="section-title">Not at dinner (pending)</div>${absent.map(g=>`<div class="sum-row"><span class="sum-key">Room ${g.room} — ${g.name}</span><span class="sum-val" style="font-size:12px;color:var(--muted);">${Number(g.adults)} adult${Number(g.adults)>1?'s':''}</span></div>`).join('')}</div>`:''}
   `;
 }
 
 function renderReport(data){
-  const dateLabel='Today — '+new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('report-content').innerHTML=buildReportHTML(data,dateLabel);
+  const label='Today — '+new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('report-content').innerHTML=buildReportHTML(data,label);
 }
 
 // ══════════════════════════════════════════════
@@ -867,28 +1009,21 @@ function renderHistory(){
   const history=getHistory();
   const dates=Object.keys(history).sort().reverse();
   const el=document.getElementById('history-list');
-  if(!dates.length){
-    el.innerHTML='<div class="history-empty">&#9728; No saved days yet.<br><br>Data is automatically saved at 10:30 each morning.<br>You can also save manually.</div>';
-    return;
-  }
+  if(!dates.length){el.innerHTML='<div class="history-empty">&#128197; No saved days yet.<br><br>Auto-saves at 22:00 each evening.</div>';return;}
   el.innerHTML=dates.map(date=>{
-    const entry=history[date];
-    const data=entry.guests;
-    const arrived=data.filter(g=>g.arrived);
-    const rate=data.length?Math.round((arrived.length/data.length)*100):0;
-    const extRev=data.filter(g=>g.paidExt).reduce((s,g)=>s+(Number(g.adults)||0)*EXT_PRICE,0);
-    const dateObj=new Date(date+'T12:00:00');
-    const dateLabel=dateObj.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+    const entry=history[date],data=entry.guests;
+    const dinnerG=data.filter(g=>!g.noDinner),arrived=dinnerG.filter(g=>g.arrived);
+    const rate=dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
+    const bbRev=data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const daRev=data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const dateLabel=new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
     return `<div class="history-card" id="hcard-${date}">
       <div class="history-card-header" onclick="toggleHistoryCard('${date}')">
-        <div>
-          <div class="history-date">${dateLabel}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Saved at ${entry.savedAt}</div>
-        </div>
+        <div><div class="history-date">${dateLabel}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Saved ${entry.savedAt}</div></div>
         <div class="history-meta">
-          <div class="history-stat">Arrived <span>${arrived.length}/${data.length}</span></div>
+          <div class="history-stat">Arrived <span>${arrived.length}/${dinnerG.length}</span></div>
           <div class="history-stat">Rate <span style="color:${rate>=80?'var(--green)':rate>=60?'var(--amber)':'var(--red)'}">${rate}%</span></div>
-          <div class="history-stat">Ext. Rev <span style="color:var(--gold)">EUR ${extRev}</span></div>
+          <div class="history-stat">Rev <span style="color:var(--green)">€${bbRev+daRev}</span></div>
           <button onclick="event.stopPropagation();exportDayJSON('${date}')" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;">&#8659; JSON</button>
           <span class="history-chevron">&#9656;</span>
         </div>
@@ -904,7 +1039,6 @@ function renderHistory(){
     </div>`;
   }).join('');
 }
-
 function clearHistorySearch(){
   document.getElementById('history-search-input').value='';
   document.getElementById('history-search-results').innerHTML='';
@@ -926,7 +1060,9 @@ function searchGuestHistory(){
       g.room.toLowerCase().includes(q)||
       g.name.toLowerCase().includes(q)
     );
-    matches.forEach(g=>{results.push({date,entry,guest:g});});
+    matches.forEach(g=>{
+      results.push({date,entry,guest:g});
+    });
   });
 
   if(!results.length){
@@ -939,12 +1075,18 @@ function searchGuestHistory(){
     ${results.map(r=>{
       const d=new Date(r.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
       const g=r.guest;
+      const arrived=g.arrived;
       const time=g.arrivalTime||'';
-      const status=g.arrived
+      const status=arrived
         ?`<span style="color:var(--green);font-weight:600;">✓ Arrived ${time?'at '+time:''}</span>`
-        :`<span style="color:var(--muted);">✗ Did not come</span>`;
+        :g.lungomare
+          ?`<span style="color:var(--lung);">🍽 Lungomare</span>`
+          :g.dineAround&&!g.daPaid
+            ?`<span style="color:var(--da);">✗ DA — did not come</span>`
+            :`<span style="color:var(--muted);">✗ Did not come</span>`;
       const extras=[];
-      if(g.paidExt) extras.push(`<span style="background:var(--gold-bg);color:var(--gold);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">External €${Number(g.adults)*EXT_PRICE}</span>`);
+      if(g.paidDinner) extras.push(`<span style="background:var(--amber-bg);color:var(--amber);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">BB €${Number(g.adults)*50}</span>`);
+      if(g.daPaid) extras.push(`<span style="background:var(--da-bg);color:var(--da);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;">DA €${Number(g.adults)*50}</span>`);
       if(g.allergy) extras.push(`<span style="background:var(--red-bg);color:var(--red);border-radius:4px;padding:1px 6px;font-size:10px;">⚠ ${g.allergy}</span>`);
 
       return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;margin-bottom:7px;">
@@ -970,20 +1112,26 @@ function importJSONHistory(e){
   reader.onload=function(ev){
     try{
       const data=JSON.parse(ev.target.result);
+      // Support both full export format and raw history object
       let days=[];
       if(data.days&&Array.isArray(data.days)){
-        days=data.days;
+        days=data.days; // Full export format
       } else if(typeof data==='object'){
+        // Raw history object {date: entry}
         days=Object.values(data);
       }
       if(!days.length){alert('No data found in JSON file.');return;}
 
       const h=getHistory();
-      let imported=0;
+      let imported=0, skipped=0;
 
       days.forEach(entry=>{
         const date=entry.date;
         if(!date) return;
+        if(h[date]){
+          skipped++;
+        }
+        // Build history entry
         h[date]={
           date,
           savedAt:entry.savedAt||'Imported',
@@ -991,8 +1139,9 @@ function importJSONHistory(e){
           guests:entry.rooms||entry.guests||[]
         };
         imported++;
+        // Also save to Firebase
         if(fbConnected){
-          window._fbSet('breakfast_history/'+date, h[date])
+          window._fbSet('dinner_history/'+date, h[date])
             .catch(err=>console.error(err));
         }
       });
@@ -1000,7 +1149,8 @@ function importJSONHistory(e){
       localStorage.setItem(LS_HISTORY,JSON.stringify(h));
       _fbHistory=h;
       renderHistory();
-      alert(`✓ Imported ${imported} day${imported!==1?'s':''}`);
+
+      alert(`✓ Imported ${imported} day${imported!==1?'s':''}${skipped?' ('+skipped+' already existed and were updated)':''}`);
     }catch(err){
       alert('Error reading JSON: '+err.message);
     }
@@ -1014,27 +1164,37 @@ function exportAllJSON(){
   const dates=Object.keys(history).sort();
   if(!dates.length){alert('No history data to export.');return;}
 
+  // Build clean export object
   const exportData={
     hotel:'White Rocks Hotel & Bungalows',
-    type:'breakfast',
+    type:'dinner',
     exportedAt:new Date().toISOString(),
     totalDays:dates.length,
     days:dates.map(date=>{
       const entry=history[date];
       const data=entry.guests||[];
-      const arrived=data.filter(g=>g.arrived);
-      const extRev=data.filter(g=>g.paidExt).reduce((s,g)=>s+(Number(g.adults)||0)*EXT_PRICE,0);
+      const dinnerG=data.filter(g=>!g.noDinner);
+      const arrived=dinnerG.filter(g=>g.arrived);
+      const bbRev=data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+      const daRev=data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
       return {
         date,
         savedAt:entry.savedAt,
         manual:entry.manual||false,
         summary:{
           totalRooms:data.length,
+          dinnerRooms:dinnerG.length,
           arrivedRooms:arrived.length,
-          occupancyPct:data.length?Math.round(arrived.length/data.length*100):0,
+          occupancyPct:dinnerG.length?Math.round(arrived.length/dinnerG.length*100):0,
           guestsServed:arrived.reduce((s,g)=>s+(Number(g.adults)||0),0),
-          externalPaid:data.filter(g=>g.paidExt).length,
-          externalRevenue:extRev
+          bbRooms:data.filter(g=>g.pkg==='BB').length,
+          bbPaidDinner:data.filter(g=>g.paidDinner).length,
+          daTotal:data.filter(g=>g.dineAround).length,
+          daPaid:data.filter(g=>g.daPaid).length,
+          lungomareRooms:data.filter(g=>g.lungomare).length,
+          bbRevenue:bbRev,
+          daRevenue:daRev,
+          totalRevenue:bbRev+daRev
         },
         rooms:data.map(g=>({
           room:g.room,
@@ -1044,7 +1204,10 @@ function exportAllJSON(){
           allergy:g.allergy||'',
           arrived:g.arrived,
           arrivalTime:g.arrivalTime||'',
-          paidExt:g.paidExt||false
+          paidDinner:g.paidDinner||false,
+          dineAround:g.dineAround||false,
+          daPaid:g.daPaid||false,
+          lungomare:g.lungomare||false
         }))
       };
     })
@@ -1053,7 +1216,7 @@ function exportAllJSON(){
   const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='white-rocks-breakfast-history.json';
+  a.download='white-rocks-dinner-history.json';
   a.click();
 }
 
@@ -1062,61 +1225,61 @@ function exportDayJSON(date){
   const entry=history[date];
   if(!entry){alert('No data for '+date);return;}
   const data=entry.guests||[];
-  const arrived=data.filter(g=>g.arrived);
-  const extRev=data.filter(g=>g.paidExt).reduce((s,g)=>s+(Number(g.adults)||0)*EXT_PRICE,0);
+  const dinnerG=data.filter(g=>!g.noDinner);
+  const arrived=dinnerG.filter(g=>g.arrived);
+  const bbRev=data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+  const daRev=data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
   const exportData={
     hotel:'White Rocks Hotel & Bungalows',
-    type:'breakfast',
+    type:'dinner',
     date,
     savedAt:entry.savedAt,
     manual:entry.manual||false,
     summary:{
       totalRooms:data.length,
+      dinnerRooms:dinnerG.length,
       arrivedRooms:arrived.length,
-      occupancyPct:data.length?Math.round(arrived.length/data.length*100):0,
+      occupancyPct:dinnerG.length?Math.round(arrived.length/dinnerG.length*100):0,
       guestsServed:arrived.reduce((s,g)=>s+(Number(g.adults)||0),0),
-      externalPaid:data.filter(g=>g.paidExt).length,
-      externalRevenue:extRev
+      bbRooms:data.filter(g=>g.pkg==='BB').length,
+      bbPaidDinner:data.filter(g=>g.paidDinner).length,
+      daTotal:data.filter(g=>g.dineAround).length,
+      daPaid:data.filter(g=>g.daPaid).length,
+      bbRevenue:bbRev,daRevenue:daRev,totalRevenue:bbRev+daRev
     },
-    rooms:data.map(g=>({room:g.room,name:g.name,adults:g.adults,pkg:g.pkg,allergy:g.allergy||'',arrived:g.arrived,arrivalTime:g.arrivalTime||'',paidExt:g.paidExt||false}))
+    rooms:data.map(g=>({room:g.room,name:g.name,adults:g.adults,pkg:g.pkg,allergy:g.allergy||'',arrived:g.arrived,arrivalTime:g.arrivalTime||'',paidDinner:g.paidDinner||false,dineAround:g.dineAround||false,daPaid:g.daPaid||false,lungomare:g.lungomare||false}))
   };
   const blob=new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download=`breakfast-${date}.json`;a.click();
+  a.download=`dinner-${date}.json`;a.click();
 }
 
 function toggleHistoryCard(date){document.getElementById('hcard-'+date).classList.toggle('expanded');}
-function deleteHistoryDay(date){
-  if(!confirm('Delete saved data for '+date+'?'))return;
-  const h=getHistory();delete h[date];
-  localStorage.setItem(LS_HISTORY,JSON.stringify(h));renderHistory();
-}
-function exportHistoryDay(date){
-  const h=getHistory();const entry=h[date];if(!entry)return;
-  const dateObj=new Date(date+'T12:00:00');
-  exportData(entry.guests,dateObj.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),date);
-}
+function deleteHistoryDay(date){if(!confirm('Delete '+date+'?'))return;const h=getHistory();delete h[date];localStorage.setItem(LS_HISTORY,JSON.stringify(h));renderHistory();}
+function exportHistoryDay(date){const h=getHistory();const e=h[date];if(!e)return;exportData(e.guests,new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),date);}
 
 // ══════════════════════════════════════════════
 // EXPORT
 // ══════════════════════════════════════════════
 function exportData(data,dateLabel,filename){
   if(typeof data==='string')data=JSON.parse(data);
-  const arrived=data.filter(g=>g.arrived).sort((a,b)=>(a.arrivalTime||'').localeCompare(b.arrivalTime||''));
-  const pending=data.filter(g=>!g.arrived);
-  const allergies=data.filter(g=>g.allergy&&g.allergy.length>0);
-  const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
-  const rate=data.length?Math.round((arrived.length/data.length)*100):0;
-  const paidExtList=data.filter(g=>g.paidExt);
-  const extRev=paidExtList.reduce((s,g)=>s+(Number(g.adults)||0)*EXT_PRICE,0);
-  let t='WHITE ROCKS HOTEL\nBREAKFAST BUFFET - MANAGER REPORT\n'+dateLabel+'\nGenerated: '+new Date().toLocaleString('en-GB')+'\n\nSUMMARY\nRooms: '+data.length+' | Arrived: '+arrived.length+' | Absent: '+pending.length+'\nGuests served: '+served+' | Attendance: '+rate+'%\nExternal charges: EUR '+extRev+' ('+paidExtList.length+' guests)\n\nARRIVAL TIMELINE\n';
-  t+=arrived.length?arrived.map(g=>{const a=Number(g.adults)||0;return g.arrivalTime+'  Room '+g.room+'  '+g.name+'  '+a+' pax'+(g.paidExt?' [EXT +EUR'+(a*EXT_PRICE)+']':'');}).join('\n'):'None.';
-  t+='\n\nNOT ARRIVED\n'+(pending.length?pending.map(g=>'Room '+g.room+'  '+g.name+'  '+g.adults+' adults').join('\n'):'All attended.');
-  t+='\n\nEXTERNAL PAYING GUESTS\n'+(paidExtList.length?paidExtList.map(g=>'Room '+g.room+'  '+g.name+'  '+g.adults+' adults  EUR '+(Number(g.adults)*EXT_PRICE)).join('\n'):'None.');
-  t+='\n\nALLERGIES\n'+(allergies.length?allergies.map(g=>'Room '+g.room+'  '+g.name+': '+g.allergy).join('\n'):'None.');
+  const dinnerG=data.filter(g=>!g.noDinner),arrived=dinnerG.filter(g=>g.arrived).sort((a,b)=>(a.arrivalTime||'').localeCompare(b.arrivalTime||'')),absent=dinnerG.filter(g=>!g.arrived&&!g.lungomare&&!(g.dineAround&&!g.daPaid)),noDinner=data.filter(g=>g.noDinner),al=data.filter(g=>g.allergy);
+  const served=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0),rate=dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
+  const bbList=data.filter(g=>g.paidDinner),bbRev=bbList.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+  const daPaidList=data.filter(g=>g.daPaid),daRev=daPaidList.reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+  const daBlockedList=data.filter(g=>g.dineAround&&!g.daPaid);
+  const lungList=data.filter(g=>g.lungomare&&!g.arrived);
+  let t=`WHITE ROCKS HOTEL\nDINNER BUFFET - MANAGER REPORT\n${dateLabel}\nGenerated: ${new Date().toLocaleString('en-GB')}\n\nSUMMARY\nRooms: ${data.length} | Dinner: ${dinnerG.length} | Arrived: ${arrived.length} | Absent: ${absent.length}\nGuests served: ${served} | Attendance: ${rate}%\n\nREVENUE\nBB Dinner: €${bbRev} (${bbList.length} rooms)\nDA paid buffet: €${daRev} (${daPaidList.length} rooms)\nTOTAL: €${bbRev+daRev}\n\nDINE AROUND BREAKDOWN\nDA total: ${data.filter(g=>g.dineAround).length} | Paid buffet: ${daPaidList.length} | Did not come: ${daBlockedList.length}\n`;
+  if(daPaidList.length)t+='\nDA - PAID BUFFET:\n'+daPaidList.map(g=>`Room ${g.room}  ${g.name}  €${Number(g.adults)*50}`).join('\n');
+  if(daBlockedList.length)t+='\nDA - DID NOT COME:\n'+daBlockedList.map(g=>`Room ${g.room}  ${g.name}`).join('\n');
+  if(lungList.length)t+='\n\nLUNGOMARE RESERVATIONS:\n'+lungList.map(g=>`Room ${g.room}  ${g.name}`).join('\n');
+  t+='\n\nARRIVAL TIMELINE\n'+(arrived.length?arrived.map(g=>{const a=Number(g.adults)||0;return`${g.arrivalTime}  Room ${g.room}  ${g.name}  ${a} pax${g.paidDinner?' [BB €'+a*50+']':''}${g.daPaid?' [DA €'+a*50+']':''}`;}).join('\n'):'None.');
+  t+='\n\nNOT ARRIVED\n'+(absent.length?absent.map(g=>`Room ${g.room}  ${g.name}`).join('\n'):'All attended.');
+  t+='\n\nALLERGIES\n'+(al.length?al.map(g=>`Room ${g.room}  ${g.name}: ${g.allergy}`).join('\n'):'None.');
+  t+='\n\nNO DINNER\n'+(noDinner.length?noDinner.map(g=>`Room ${g.room}  ${g.name} (${g.pkg||'-'})`).join('\n'):'None.');
   const blob=new Blob([t],{type:'text/plain'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='breakfast-report-'+(filename||TODAY)+'.txt';a.click();
+  a.href=URL.createObjectURL(blob);a.download=`dinner-report-${filename||TODAY}.txt`;a.click();
 }
 
 // ══════════════════════════════════════════════
@@ -1124,43 +1287,68 @@ function exportData(data,dateLabel,filename){
 // ══════════════════════════════════════════════
 function openAddModal(){document.getElementById('add-modal').classList.add('open');document.getElementById('f-room').focus();}
 function addRoom(){
-  const room=document.getElementById('f-room').value.trim()||'EXT';
-  const name=document.getElementById('f-name').value.trim().toUpperCase();
-  const adults=parseInt(document.getElementById('f-adults').value)||1;
-  const pkg=document.getElementById('f-pkg').value;
-  const allergy=document.getElementById('f-allergy').value.trim();
-  if(!name){alert('Please enter guest name.');return;}
-  guests.push({room,name,adults,pkg,allergy,arrived:false,arrivalTime:'',paidExt:false});
+  const room=document.getElementById('f-room').value.trim(),name=document.getElementById('f-name').value.trim().toUpperCase(),adults=parseInt(document.getElementById('f-adults').value)||0,pkg=document.getElementById('f-pkg').value,allergy=document.getElementById('f-allergy').value.trim();
+  if(!room||!name){alert('Please enter room and name.');return;}
+  guests.push({room,name,adults,pkg,allergy,noDinner:pkg==='BB'||adults===0,arrived:false,arrivalTime:'',paidDinner:false,dineAround:false,daPaid:false,lungomare:false});
   closeModal('add-modal');render();
 }
+
+function openDAModal(){daIdx=null;document.getElementById('da-room-input').value='';document.getElementById('da-match').innerHTML='';document.getElementById('da-modal').classList.add('open');document.getElementById('da-room-input').focus();}
+function daSearch(){
+  const q=document.getElementById('da-room-input').value.trim(),box=document.getElementById('da-match');daIdx=null;
+  if(!q){box.innerHTML='';return;}
+  const i=guests.findIndex(g=>g.room===q||g.room===q.padStart(3,'0'));
+  if(i===-1){box.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;">Room not found.</div>';return;}
+  daIdx=i;const g=guests[i];
+  box.innerHTML=`<div style="background:var(--da-bg);border:1px solid rgba(249,115,22,.25);border-radius:8px;padding:10px 13px;"><div style="font-size:14px;font-weight:600;">Room ${g.room} — ${g.name}${g.dineAround?' (already DA)':''}</div><div style="font-size:12px;color:var(--muted);">${g.pkg} · ${g.adults} adult${g.adults>1?'s':''}</div></div>`;
+}
+function confirmDA(){if(daIdx===null){alert('Please enter a valid room number.');return;}guests[daIdx].dineAround=true;guests[daIdx].daPaid=false;closeModal('da-modal');render();}
+
+// LUNGOMARE
+function openLungModal(){lungIdx=null;document.getElementById('lung-room-input').value='';document.getElementById('lung-match').innerHTML='';document.getElementById('lung-modal').classList.add('open');document.getElementById('lung-room-input').focus();}
+function lungSearch(){
+  const q=document.getElementById('lung-room-input').value.trim(),box=document.getElementById('lung-match');lungIdx=null;
+  if(!q){box.innerHTML='';return;}
+  const i=guests.findIndex(g=>g.room===q||g.room===q.padStart(3,'0'));
+  if(i===-1){box.innerHTML='<div style="font-size:13px;color:var(--muted);padding:6px 0;">Room not found.</div>';return;}
+  lungIdx=i;const g=guests[i];
+  box.innerHTML=`<div style="background:var(--lung-bg);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:10px 13px;"><div style="font-size:14px;font-weight:600;">Room ${g.room} — ${g.name}${g.lungomare?' (already Lungomare)':''}</div><div style="font-size:12px;color:var(--muted);">${g.pkg} · ${g.adults} adult${g.adults>1?'s':''}</div></div>`;
+}
+function confirmLung(){if(lungIdx===null){alert('Please enter a valid room number.');return;}guests[lungIdx].lungomare=true;closeModal('lung-modal');render();}
+
 function openEdit(i){
-  editIdx=i;const g=guests[i];
+  editIdx=i;const g=guests[i],adults=Number(g.adults)||0;
   document.getElementById('edit-room-lbl').textContent=g.room;
   document.getElementById('e-name').value=g.name;
   document.getElementById('e-adults').value=g.adults;
-  document.getElementById('e-pkg').value=g.pkg||'HB';
+  document.getElementById('e-pkg').value=g.pkg||'';
   document.getElementById('e-allergy').value=g.allergy||'';
   const db=document.getElementById('danger-btns');let html='';
-  if(g.arrived)html+='<button class="btn-danger" onclick="dangerAct(\'arrival\','+i+')">Undo check-in</button>';
-  if(g.paidExt)html+='<button class="btn-danger" onclick="dangerAct(\'extpay\','+i+')">Undo External payment</button>';
-  html+='<button class="btn-danger" style="background:var(--red-bg);border-color:var(--red);color:var(--red);font-weight:700;" onclick="dangerAct(\'delete\','+i+')">&#128465; Delete Room</button>';
-  db.innerHTML=html;
-  document.getElementById('edit-modal').classList.add('open');
+  if(g.arrived)html+=`<button class="btn-danger" onclick="dangerAct('arrival',${i})">Undo check-in</button>`;
+  if(g.paidDinner)html+=`<button class="btn-danger" onclick="dangerAct('bbpay',${i})">Undo BB payment</button>`;
+  if(g.daPaid)html+=`<button class="btn-danger" onclick="dangerAct('dapay',${i})">Undo DA payment</button>`;
+  if(g.dineAround)html+=`<button class="btn-danger" onclick="dangerAct('da',${i})">Remove DA mark</button>`;
+  if(g.lungomare)html+=`<button class="btn-danger" onclick="dangerAct('lung',${i})">Remove Lungomare</button>`;
+  html+=`<button class="btn-danger" style="background:var(--red-bg);border-color:var(--red);color:var(--red);font-weight:700;" onclick="dangerAct('delete',${i})">&#128465; Delete Room</button>`;
+  if(!html.includes('No active'))html=html;
+  db.innerHTML=html;document.getElementById('edit-modal').classList.add('open');
 }
 function saveEdit(){
   if(editIdx===null)return;
-  const newName=document.getElementById('e-name').value.trim().toUpperCase();
-  const newAdults=parseInt(document.getElementById('e-adults').value)||1;
-  const newPkg=document.getElementById('e-pkg').value;
-  const newAllergy=document.getElementById('e-allergy').value.trim();
-  if(!newName){alert('Guest name cannot be empty.');return;}
-  guests[editIdx].name=newName;guests[editIdx].adults=newAdults;guests[editIdx].pkg=newPkg;guests[editIdx].allergy=newAllergy;
+  const n=document.getElementById('e-name').value.trim().toUpperCase(),a=parseInt(document.getElementById('e-adults').value)||0,p=document.getElementById('e-pkg').value,al=document.getElementById('e-allergy').value.trim();
+  if(!n){alert('Name cannot be empty.');return;}
+  const g=guests[editIdx],wasBB=g.pkg==='BB',nowBB=p==='BB';
+  guests[editIdx].name=n;guests[editIdx].adults=a;guests[editIdx].pkg=p;guests[editIdx].allergy=al;
+  if(!wasBB&&nowBB&&!g.paidDinner)guests[editIdx].noDinner=true;else if(wasBB&&!nowBB)guests[editIdx].noDinner=false;
   closeModal('edit-modal');render();
 }
 function dangerAct(action,i){
   if(!confirm('Are you sure?'))return;
   if(action==='arrival'){guests[i].arrived=false;guests[i].arrivalTime='';}
-  else if(action==='extpay'){guests[i].paidExt=false;guests[i].arrived=false;guests[i].arrivalTime='';}
+  else if(action==='bbpay'){guests[i].paidDinner=false;guests[i].noDinner=true;}
+  else if(action==='dapay'){guests[i].daPaid=false;}
+  else if(action==='da'){guests[i].dineAround=false;guests[i].daPaid=false;}
+  else if(action==='lung'){guests[i].lungomare=false;}
   else if(action==='delete'){guests.splice(i,1);closeModal('edit-modal');render();return;}
   closeModal('edit-modal');render();
 }
@@ -1168,7 +1356,7 @@ function closeModal(id){
   document.getElementById(id).classList.remove('open');
   if(id==='add-modal'){['f-room','f-name','f-allergy'].forEach(x=>document.getElementById(x).value='');document.getElementById('f-adults').value=2;}
 }
-['add-modal','edit-modal'].forEach(id=>{
+['add-modal','da-modal','lung-modal','edit-modal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal(id);});
 });
 
@@ -1180,8 +1368,8 @@ let currentImportType='pdf';
 function switchImportType(type){
   currentImportType=type;
   const isPDF=type==='pdf';
-  document.getElementById('itype-pdf').style.cssText=`flex:1;padding:10px;border:1px solid ${isPDF?'var(--gold)':'var(--border)'};border-radius:var(--radius);background:${isPDF?'var(--gold-bg)':'var(--surface)'};color:${isPDF?'var(--gold)':'var(--muted)'};font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;`;
-  document.getElementById('itype-chr').style.cssText=`flex:1;padding:10px;border:1px solid ${!isPDF?'var(--gold)':'var(--border)'};border-radius:var(--radius);background:${!isPDF?'var(--gold-bg)':'var(--surface)'};color:${!isPDF?'var(--gold)':'var(--muted)'};font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;`;
+  document.getElementById('itype-pdf').style.cssText=`flex:1;padding:10px;border:1px solid ${isPDF?'var(--blue)':'var(--border)'};border-radius:var(--radius);background:${isPDF?'var(--blue-bg)':'var(--surface)'};color:${isPDF?'var(--blue)':'var(--muted)'};font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;`;
+  document.getElementById('itype-chr').style.cssText=`flex:1;padding:10px;border:1px solid ${!isPDF?'var(--blue)':'var(--border)'};border-radius:var(--radius);background:${!isPDF?'var(--blue-bg)':'var(--surface)'};color:${!isPDF?'var(--blue)':'var(--muted)'};font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;`;
   document.getElementById('drop-title').textContent=isPDF?'Drag & drop το PDF εδώ':'Drag & drop το CHR/CSV εδώ';
   document.getElementById('file-input').accept=isPDF?'.pdf,.txt':'.chr,.csv,.txt';
   cancelImport();
@@ -1197,20 +1385,22 @@ function processFile(file){
   document.getElementById('import-result-title').textContent='Reading '+file.name+'...';
   document.getElementById('import-preview').innerHTML='<div style="color:var(--muted);padding:20px;text-align:center;">&#9203; Processing...</div>';
 
+  // CHR/CSV file
   if(currentImportType==='chr'||file.name.endsWith('.chr')||file.name.endsWith('.csv')){
     const r=new FileReader();
     r.onload=function(e){parseCHR(e.target.result,file.name);};
     r.readAsText(file);
     return;
   }
+
   if(file.name.endsWith('.pdf')){
-    const reader=new FileReader();
-    reader.onload=async function(e){await extractTextFromPDF(e.target.result,file.name);};
-    reader.readAsArrayBuffer(file);
+    const r=new FileReader();
+    r.onload=async function(e){await extractTextFromPDF(e.target.result,file.name);};
+    r.readAsArrayBuffer(file);
   } else {
-    const reader=new FileReader();
-    reader.onload=function(e){parseProtelText(e.target.result,file.name);};
-    reader.readAsText(file);
+    const r=new FileReader();
+    r.onload=function(e){parseProtelText(e.target.result,file.name);};
+    r.readAsText(file);
   }
 }
 
@@ -1235,7 +1425,7 @@ async function extractTextFromPDF(buffer,filename){
       fullText+='\n';
     }
     parseProtelText(fullText,filename);
-  }catch(e){document.getElementById('import-result-title').textContent='Error reading PDF: '+e.message;}
+  }catch(e){document.getElementById('import-result-title').textContent='Error: '+e.message;}
 }
 
 // ══════════════════════════════════════════════
@@ -1246,6 +1436,7 @@ function parseCHR(text, filename){
   const lines=text.split('\n').filter(l=>l.trim().length>0);
 
   for(const line of lines){
+    // Parse all CSV fields handling quoted values
     const fields=[];
     let cur='', inQ=false;
     for(let i=0;i<line.length;i++){
@@ -1255,31 +1446,43 @@ function parseCHR(text, filename){
     }
     fields.push(cur.trim());
 
+    // Find room number — 3-digit number field
     const roomIdx=fields.findIndex(f=>/^\d{3}$/.test(f));
     if(roomIdx===-1) continue;
 
     const room=fields[roomIdx];
+    // PKG is next non-empty field after room (may be empty string)
     const pkg=(fields[roomIdx+1]||'').trim();
+    // GUEST name is 2 fields after room
     const name=(fields[roomIdx+2]||'').trim();
+    // ARR = roomIdx+3, DEP = roomIdx+4, AD = roomIdx+5
     const adults=parseInt(fields[roomIdx+5])||0;
-    // BF_AT = roomIdx+11
-    const bfAt=parseInt(fields[roomIdx+11])||0;
+
+    // Dinner column: after AD,EB,C1,C2,C3,C4 = 6 fields, then BF_AT,BF_CH,LU_AT,LU_CH,DIN_AT
+    // roomIdx+5=AD, +6=EB, +7=C1, +8=C2, +9=C3, +10=C4
+    // +11=BF_AT, +12=BF_CH, +13=LU_AT, +14=LU_CH, +15=DIN_AT, +16=DIN_CH
+    const dinnerAt=parseInt(fields[roomIdx+15])||0;
 
     if(!name||name==='TOTAL:'||name==='ROOMS'||name==='ADULTS'||name==='Extra Bed :') continue;
+    // Skip if name looks like a number or date
     if(/^\d/.test(name)) continue;
 
-    // Use breakfast count for adults if available
-    const pax=bfAt>0?bfAt:adults;
+    const hasDinner=dinnerAt>0;
+    const isBB=pkg==='BB';
 
     rooms.push({
       room,
       name,
-      adults:pax,
+      adults,
       pkg:pkg||'HB',
       allergy:'',
+      noDinner:!hasDinner||isBB,
       arrived:false,
       arrivalTime:'',
-      paidExt:false
+      paidDinner:false,
+      dineAround:false,
+      daPaid:false,
+      lungomare:false
     });
   }
 
@@ -1309,7 +1512,7 @@ function parseProtelText(text,filename){
     const pkgMatch=line.match(/\b(HB|BB|FB|AI)\b/);
     const pkg=pkgMatch?pkgMatch[1]:'HB';
 
-    // Extract name — ALL CAPS words
+    // Extract name — ALL CAPS words, not pkg, not numbers, not dates
     const tokens=line.split(/\s+/).filter(t=>{
       if(['HB','BB','FB','AI'].includes(t)) return false;
       if(/^\d/.test(t)) return false;
@@ -1324,24 +1527,34 @@ function parseProtelText(text,filename){
     const adultsMatch=line.match(/\b([1-9])\s+0\s+0/);
     const adults=adultsMatch?parseInt(adultsMatch[1]):2;
 
-    // Look ahead for allergy on next line(s)
+    // Check NEXT line(s) for allergy info
+    // Allergies can appear on the line immediately after the room line
     let allergy='';
+
+    // Also check if allergy is on the same line
     if(isAllergyLine(line)){
+      allergy=line.replace(/\d{3}/g,'').replace(/\b(HB|BB|FB|AI)\b/g,'').replace(/\d+\/\d+\/\d+/g,'').replace(/\b\d+\b/g,'').trim();
       allergy=allergyKw.filter(k=>line.toUpperCase().includes(k)).join(' + ');
     }
+
+    // Look ahead for allergy line right after this room
     if(!allergy){
       let j=i+1;
-      while(j<lines.length&&!isRoomLine(lines[j])){
+      // Skip blank and collect allergy lines that follow this room
+      while(j<lines.length && !isRoomLine(lines[j])){
         if(isAllergyLine(lines[j])){
           allergy=(allergy?allergy+' · ':'')+lines[j].trim();
         }
         j++;
+        // Stop after 2 non-room lines to avoid false positives
         if(j>i+3) break;
       }
     }
 
-    rooms.push({room,name,adults,pkg:pkg||'HB',allergy,arrived:false,arrivalTime:'',paidExt:false});
+    const hasDinner=pkg!=='BB'&&adults>0;
+    rooms.push({room,name,adults,pkg,allergy,noDinner:!hasDinner,arrived:false,arrivalTime:'',paidDinner:false,dineAround:false,daPaid:false,lungomare:false});
   }
+
   showImportPreview(rooms,filename);
 }
 
@@ -1350,16 +1563,16 @@ function showImportPreview(rooms,filename){
   const titleEl=document.getElementById('import-result-title');
   const previewEl=document.getElementById('import-preview');
   const logEl=document.getElementById('import-log');
-  if(!rooms.length){titleEl.textContent='Could not parse rooms. Please check the file.';previewEl.innerHTML='';return;}
-  const allergies=rooms.filter(r=>r.allergy).length;
-  titleEl.textContent='Found '+rooms.length+' rooms'+(allergies?' · '+allergies+' allergy notes':'');
-  previewEl.innerHTML=rooms.map(r=>`<div class="preview-row"><span class="preview-room">${r.room}</span><span style="flex:1;font-weight:500;">${r.name}</span><span class="preview-pkg">${r.pkg}</span><span style="font-size:12px;color:var(--muted);">${r.adults} adults</span>${r.allergy?'<span class="preview-allergy">⚠ '+r.allergy+'</span>':''}</div>`).join('');
-  logEl.innerHTML='&#9432; This will <strong>replace</strong> today\'s list. Current data will be saved to History first.';
+  if(!rooms.length){titleEl.textContent='Could not parse rooms.';previewEl.innerHTML='';return;}
+  const dinner=rooms.filter(r=>!r.noDinner).length,bb=rooms.filter(r=>r.noDinner).length,al=rooms.filter(r=>r.allergy).length;
+  titleEl.textContent=`✓ Found ${rooms.length} rooms — ${dinner} dinner · ${bb} BB · ${al} allergy notes`;
+  previewEl.innerHTML=rooms.map(r=>`<div class="preview-row"><span class="preview-room">${r.room}</span><span style="flex:1;font-weight:500;">${r.name}</span><span class="preview-pkg">${r.pkg}</span><span style="font-size:12px;color:var(--muted);">${r.adults} adults</span>${r.noDinner?'<span style="font-size:10px;color:var(--muted);background:var(--surface2);border-radius:4px;padding:1px 6px;">No dinner</span>':''}${r.allergy?'<span class="preview-allergy">⚠ '+r.allergy+'</span>':''}</div>`).join('');
+  logEl.innerHTML='&#9432; This will <strong>replace</strong> today\'s list. Current data saved to History first.';
 }
 function cancelImport(){importedRooms=[];document.getElementById('import-result').classList.remove('show');}
 function confirmImport(){
-  if(!importedRooms.length){alert('No rooms to import.');return;}
-  if(!confirm('Replace today\'s board with '+importedRooms.length+' rooms?\n\nCurrent data will be saved to History first.'))return;
+  if(!importedRooms.length)return;
+  if(!confirm(`Replace today's board with ${importedRooms.length} rooms?\nCurrent data will be saved to History first.`))return;
   saveToday(true);
   guests=importedRooms.map(r=>({...r}));
   pushToFirebase();
@@ -1369,9 +1582,9 @@ function confirmImport(){
   document.querySelector('.tab').classList.add('active');
   document.getElementById('panel-board').classList.add('active');
   document.getElementById('fabs').style.display='flex';
-  const badge=document.getElementById('autosave-badge');
-  badge.textContent='✓ '+importedRooms.length+' rooms imported!';
-  badge.classList.add('show');setTimeout(()=>badge.classList.remove('show'),4000);
+  const b=document.getElementById('autosave-badge');
+  b.textContent='✓ '+importedRooms.length+' rooms imported!';b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'),4000);
   importedRooms=[];
 }
 
@@ -1380,67 +1593,84 @@ function confirmImport(){
 // ══════════════════════════════════════════════
 let chartRevenue=null, chartOccupancy=null, chartPeak=null;
 
-function switchStatsTab(tab){
-  const tabs=['history','manual'];
-  tabs.forEach(t=>{
-    const el=document.getElementById('stats-'+t+'-section');
-    const btn=document.getElementById('stab-'+t);
-    if(!el||!btn) return;
-    const active=t===tab;
-    el.style.display=active?'block':'none';
-    btn.style.borderColor=active?'var(--gold)':'var(--border)';
-    btn.style.background=active?'var(--gold-bg)':'var(--surface)';
-    btn.style.color=active?'var(--gold)':'var(--muted)';
-    btn.style.fontWeight=active?'600':'400';
-  });
-  if(tab==='manual') renderManualList();
-}
-
 function renderStats(){
-  const from=document.getElementById('stats-from').value;
-  const to=document.getElementById('stats-to').value;
+  const from = document.getElementById('stats-from').value;
+  const to = document.getElementById('stats-to').value;
   if(!from||!to){alert('Please select a date range.');return;}
-  const history=getHistory();
-  const dates=Object.keys(history).filter(d=>d>=from&&d<=to).sort();
+
+  const history = getHistory();
+  // Filter dates in range
+  const dates = Object.keys(history).filter(d=>d>=from&&d<=to).sort();
+
   if(!dates.length){
-    document.getElementById('stats-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">No data found for this period.</div>';
+    document.getElementById('stats-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted);font-size:14px;">No data found for this period.<br>Make sure the dates are saved in History.</div>';
     return;
   }
-  let totalRevenue=0, totalArrived=0, totalRooms=0, totalGuests=0;
-  let peakHours={}, bestDay={date:'',rate:0};
+
+  // Aggregate data
+  let totalRevenue=0, totalBBRev=0, totalDARev=0;
+  let totalRooms=0, totalDinnerRooms=0, totalArrived=0, totalGuests=0;
+  let peakHours={};
+  let daTotal=0, daPaidTotal=0;
+  let allergyCount=0;
+  let bestDay={date:'',rate:0};
+
   const revenueByDay=[], occupancyByDay=[], dayLabels=[];
 
   dates.forEach(date=>{
-    const data=history[date].guests;
-    const arrived=data.filter(g=>g.arrived);
-    const extRev=data.filter(g=>g.paidExt).reduce((s,g)=>s+(Number(g.adults)||0)*EXT_PRICE,0);
-    const dayRate=data.length?Math.round((arrived.length/data.length)*100):0;
-    totalRevenue+=extRev; totalArrived+=arrived.length; totalRooms+=data.length;
+    const data = history[date].guests;
+    const dinnerG = data.filter(g=>!g.noDinner);
+    const arrived = dinnerG.filter(g=>g.arrived);
+    const bbRev = data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const daRev = data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const dayRev = bbRev+daRev;
+    const dayRate = dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
+
+    totalRevenue+=dayRev; totalBBRev+=bbRev; totalDARev+=daRev;
+    totalRooms+=data.length; totalDinnerRooms+=dinnerG.length;
+    totalArrived+=arrived.length;
     totalGuests+=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
-    arrived.forEach(g=>{if(g.arrivalTime){const h=g.arrivalTime.split(':')[0]+':00';peakHours[h]=(peakHours[h]||0)+1;}});
+    daTotal+=data.filter(g=>g.dineAround).length;
+    daPaidTotal+=data.filter(g=>g.daPaid).length;
+    allergyCount+=data.filter(g=>g.allergy&&g.allergy.length>0).length;
+
+    // Peak hours
+    arrived.forEach(g=>{
+      if(g.arrivalTime){
+        const h=g.arrivalTime.split(':')[0]+':00';
+        peakHours[h]=(peakHours[h]||0)+1;
+      }
+    });
+
     if(dayRate>bestDay.rate) bestDay={date,rate:dayRate};
-    revenueByDay.push(extRev); occupancyByDay.push(dayRate);
-    dayLabels.push(new Date(date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
+
+    revenueByDay.push(dayRev);
+    occupancyByDay.push(dayRate);
+    const d=new Date(date+'T12:00:00');
+    dayLabels.push(d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
   });
 
-  const avgOccupancy=totalRooms?Math.round(totalArrived/totalRooms*100):0;
-  const avgGuests=totalArrived?Math.round(totalGuests/totalArrived*10)/10:0;
-  const peakHour=Object.entries(peakHours).sort((a,b)=>b[1]-a[1])[0];
-  const bestDayLabel=bestDay.date?new Date(bestDay.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'-';
-  const slots=['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00'];
-  const peakData=slots.map(h=>peakHours[h.split(':')[0]+':00']||0);
+  const avgOccupancy = dates.length?Math.round(totalArrived/totalDinnerRooms*100):0;
+  const avgGuests = totalArrived?Math.round(totalGuests/totalArrived*10)/10:0;
+  const peakHour = Object.entries(peakHours).sort((a,b)=>b[1]-a[1])[0];
+  const bestDayObj = bestDay.date?new Date(bestDay.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'-';
+
+  // Peak hours chart data
+  const allHours=['18:00','19:00','20:00','21:00','22:00'];
+  const peakData=allHours.map(h=>peakHours[h]||0);
 
   document.getElementById('stats-content').innerHTML=`
+    <!-- Summary cards -->
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
       <div style="background:var(--green-bg);border:1px solid rgba(52,211,153,.25);border-radius:var(--radius-lg);padding:14px 16px;">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:700;margin-bottom:6px;">External Revenue</div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:700;margin-bottom:6px;">Total Revenue</div>
         <div style="font-size:28px;font-weight:700;color:var(--green);">€${totalRevenue}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">€${EXT_PRICE}/person external guests</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">BB €${totalBBRev} · DA €${totalDARev}</div>
       </div>
-      <div style="background:var(--gold-bg);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-lg);padding:14px 16px;">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
-        <div style="font-size:28px;font-weight:700;color:var(--gold);">${avgOccupancy}%</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${totalArrived} / ${totalRooms} rooms</div>
+      <div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
+        <div style="font-size:28px;font-weight:700;color:var(--blue);">${avgOccupancy}%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${totalArrived} / ${totalDinnerRooms} dinner rooms</div>
       </div>
       <div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--radius-lg);padding:14px 16px;">
         <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);font-weight:700;margin-bottom:6px;">Peak Hour</div>
@@ -1449,76 +1679,477 @@ function renderStats(){
       </div>
       <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 16px;">
         <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:6px;">Best Day</div>
-        <div style="font-size:18px;font-weight:700;color:var(--text);">${bestDayLabel}</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);">${bestDayObj}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;">${bestDay.rate}% attendance</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;">
+
+    <!-- More stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;">
         <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Avg pax/room</div>
         <div style="font-size:22px;font-weight:700;">${avgGuests}</div>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;">
-        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Guests served</div>
-        <div style="font-size:22px;font-weight:700;">${totalGuests}</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">DA paid</div>
+        <div style="font-size:22px;font-weight:700;color:var(--da);">${daPaidTotal}<span style="font-size:13px;color:var(--muted);"> / ${daTotal}</span></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Allergy rooms</div>
+        <div style="font-size:22px;font-weight:700;color:var(--red);">${allergyCount}</div>
       </div>
     </div>
+
+    <!-- Charts -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">External Revenue per day (€)</div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Revenue per day (€)</div>
       <canvas id="chart-revenue" height="120"></canvas>
     </div>
+
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Occupancy % per day</div>
       <canvas id="chart-occupancy" height="120"></canvas>
     </div>
+
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Arrivals by hour</div>
       <canvas id="chart-peak" height="120"></canvas>
     </div>
-    <div style="font-size:11px;color:var(--muted);text-align:center;padding:8px;">${dates.length} day${dates.length>1?'s':''} · ${totalGuests} guests served</div>
+
+    <div style="font-size:11px;color:var(--muted);text-align:center;padding:8px;">
+      ${dates.length} day${dates.length>1?'s':''} · ${totalRooms} total rooms · ${totalGuests} guests served
+    </div>
   `;
 
+  // Show print button
   document.getElementById('stats-print-btn').style.display='block';
-  Chart.defaults.color='#8b90a8';Chart.defaults.borderColor='rgba(255,255,255,0.06)';
-  if(chartRevenue)chartRevenue.destroy();
-  chartRevenue=new Chart(document.getElementById('chart-revenue'),{type:'bar',data:{labels:dayLabels,datasets:[{label:'Revenue (€)',data:revenueByDay,backgroundColor:'rgba(52,211,153,0.3)',borderColor:'#34d399',borderWidth:2,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}}}});
-  if(chartOccupancy)chartOccupancy.destroy();
-  chartOccupancy=new Chart(document.getElementById('chart-occupancy'),{type:'line',data:{labels:dayLabels,datasets:[{label:'Occupancy %',data:occupancyByDay,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',borderWidth:2,pointBackgroundColor:'#f59e0b',pointRadius:4,fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}});
-  if(chartPeak)chartPeak.destroy();
-  chartPeak=new Chart(document.getElementById('chart-peak'),{type:'bar',data:{labels:slots,datasets:[{label:'Arrivals',data:peakData,backgroundColor:'rgba(251,191,36,0.3)',borderColor:'#fbbf24',borderWidth:2,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{stepSize:1}}}}});
+
+  // Chart defaults
+  Chart.defaults.color='#8b90a8';
+  Chart.defaults.borderColor='rgba(255,255,255,0.06)';
+
+  // Revenue chart
+  if(chartRevenue) chartRevenue.destroy();
+  chartRevenue = new Chart(document.getElementById('chart-revenue'),{
+    type:'bar',
+    data:{
+      labels:dayLabels,
+      datasets:[{
+        label:'Revenue (€)',
+        data:revenueByDay,
+        backgroundColor:'rgba(52,211,153,0.3)',
+        borderColor:'#34d399',
+        borderWidth:2,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}
+      }
+    }
+  });
+
+  // Occupancy chart
+  if(chartOccupancy) chartOccupancy.destroy();
+  chartOccupancy = new Chart(document.getElementById('chart-occupancy'),{
+    type:'line',
+    data:{
+      labels:dayLabels,
+      datasets:[{
+        label:'Occupancy %',
+        data:occupancyByDay,
+        borderColor:'#60a5fa',
+        backgroundColor:'rgba(96,165,250,0.1)',
+        borderWidth:2,
+        pointBackgroundColor:'#60a5fa',
+        pointRadius:4,
+        fill:true,
+        tension:0.3
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}
+      }
+    }
+  });
+
+  // Peak hours chart
+  if(chartPeak) chartPeak.destroy();
+  chartPeak = new Chart(document.getElementById('chart-peak'),{
+    type:'bar',
+    data:{
+      labels:allHours,
+      datasets:[{
+        label:'Arrivals',
+        data:peakData,
+        backgroundColor:'rgba(251,191,36,0.3)',
+        borderColor:'#fbbf24',
+        borderWidth:2,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{stepSize:1}}
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// STATS TAB SWITCH
+// ══════════════════════════════════════════════
+function switchStatsTab(tab){
+  const tabs=['history','weekly','manual'];
+  tabs.forEach(t=>{
+    const el=document.getElementById('stats-'+t+'-section');
+    const btn=document.getElementById('stab-'+t);
+    if(!el||!btn) return;
+    const active=t===tab;
+    el.style.display=active?'block':'none';
+    btn.style.borderColor=active?'var(--blue)':'var(--border)';
+    btn.style.background=active?'var(--blue-bg)':'var(--surface)';
+    btn.style.color=active?'var(--blue)':'var(--muted)';
+  });
+  if(tab==='manual') renderManualList();
+  if(tab==='weekly') initWeeklySelector();
+}
+
+// ══════════════════════════════════════════════
+// WEEKLY ANALYTICS
+// ══════════════════════════════════════════════
+let selectedWeeks=new Set(), activeMonthFilter=null;
+
+function getWeekKey(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const day=d.getDay();
+  const diff=d.getDate()-day+(day===0?-6:1); // Monday
+  const mon=new Date(d.setDate(diff));
+  return mon.toISOString().split('T')[0];
+}
+
+function getWeekLabel(weekKey){
+  const mon=new Date(weekKey+'T12:00:00');
+  const sun=new Date(mon);sun.setDate(sun.getDate()+6);
+  const fmt=(d)=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  return fmt(mon)+' – '+fmt(sun);
+}
+
+function getWeeksFromHistory(){
+  const history=getHistory();
+  const weeks={};
+  Object.keys(history).sort().forEach(date=>{
+    const wk=getWeekKey(date);
+    if(!weeks[wk]) weeks[wk]=[];
+    weeks[wk].push(date);
+  });
+  return weeks;
+}
+
+function getMonthsFromHistory(){
+  const history=getHistory();
+  const months=new Set();
+  Object.keys(history).forEach(date=>{
+    months.add(date.substring(0,7)); // YYYY-MM
+  });
+  return [...months].sort();
+}
+
+function initWeeklySelector(){
+  const weeks=getWeeksFromHistory();
+  const months=getMonthsFromHistory();
+
+  // Month filter buttons
+  const mEl=document.getElementById('month-filter-btns');
+  mEl.innerHTML='<button onclick="filterWeeksByMonth(null)" id="mf-all" style="padding:6px 12px;border:1px solid var(--blue);border-radius:20px;background:var(--blue-bg);color:var(--blue);font-family:\'DM Sans\',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">All</button>';
+  months.forEach(m=>{
+    const [y,mo]=m.split('-');
+    const label=new Date(y,parseInt(mo)-1,1).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+    mEl.innerHTML+=`<button onclick="filterWeeksByMonth('${m}')" id="mf-${m}" style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;">${label}</button>`;
+  });
+
+  renderWeekSelector(weeks);
+}
+
+function filterWeeksByMonth(month){
+  activeMonthFilter=month;
+  // Update button styles
+  document.querySelectorAll('[id^="mf-"]').forEach(b=>{
+    const isActive=(month===null&&b.id==='mf-all')||(b.id==='mf-'+month);
+    b.style.borderColor=isActive?'var(--blue)':'var(--border)';
+    b.style.background=isActive?'var(--blue-bg)':'var(--surface)';
+    b.style.color=isActive?'var(--blue)':'var(--muted)';
+    b.style.fontWeight=isActive?'600':'400';
+  });
+  const weeks=getWeeksFromHistory();
+  renderWeekSelector(weeks, month);
+}
+
+function renderWeekSelector(weeks, monthFilter){
+  const el=document.getElementById('week-selector');
+  const weekKeys=Object.keys(weeks).sort().reverse();
+  const filtered=monthFilter?weekKeys.filter(wk=>wk.startsWith(monthFilter)||weeks[wk].some(d=>d.startsWith(monthFilter))):weekKeys;
+
+  if(!filtered.length){
+    el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px;">No data for this period.</div>';
+    return;
+  }
+
+  el.innerHTML=filtered.map(wk=>{
+    const days=weeks[wk].length;
+    const checked=selectedWeeks.has(wk);
+    return `<label style="display:flex;align-items:center;gap:10px;background:${checked?'var(--blue-bg)':'var(--surface)'};border:1px solid ${checked?'rgba(96,165,250,.3)':'var(--border)'};border-radius:var(--radius);padding:9px 12px;cursor:pointer;transition:all .15s;">
+      <input type="checkbox" ${checked?'checked':''} onchange="toggleWeek('${wk}',this)" style="accent-color:var(--blue);width:16px;height:16px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:${checked?'var(--blue)':'var(--text)'};">${getWeekLabel(wk)}</div>
+        <div style="font-size:11px;color:var(--muted);">${days} day${days>1?'s':''} of data</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function toggleWeek(wk, cb){
+  if(cb.checked) selectedWeeks.add(wk);
+  else selectedWeeks.delete(wk);
+  // Update appearance
+  const weeks=getWeeksFromHistory();
+  renderWeekSelector(weeks, activeMonthFilter);
+}
+
+function selectAllWeeks(){
+  const weeks=getWeeksFromHistory();
+  Object.keys(weeks).forEach(wk=>selectedWeeks.add(wk));
+  renderWeekSelector(weeks, activeMonthFilter);
+}
+
+function clearAllWeeks(){
+  selectedWeeks.clear();
+  const weeks=getWeeksFromHistory();
+  renderWeekSelector(weeks, activeMonthFilter);
+}
+
+function renderWeeklyStats(){
+  if(!selectedWeeks.size){alert('Please select at least one week.');return;}
+  const history=getHistory();
+  const weeks=getWeeksFromHistory();
+  const sortedWks=[...selectedWeeks].sort();
+
+  // Build per-week aggregates
+  const weekData=sortedWks.map(wk=>{
+    const dates=weeks[wk]||[];
+    let totalRooms=0,totalDinner=0,totalArrived=0,totalGuests=0;
+    let bbTotal=0,bbPaid=0,daTotal=0,daPaid=0;
+    const hourCounts={};
+    let daysWithData=0;
+
+    dates.forEach(date=>{
+      if(!history[date]) return;
+      const data=history[date].guests;
+      daysWithData++;
+      const dinnerG=data.filter(g=>!g.noDinner);
+      const arrived=dinnerG.filter(g=>g.arrived);
+      totalRooms+=data.length;
+      totalDinner+=dinnerG.length;
+      totalArrived+=arrived.length;
+      totalGuests+=arrived.reduce((s,g)=>s+(Number(g.adults)||0),0);
+      bbTotal+=data.filter(g=>g.pkg==='BB').length;
+      bbPaid+=data.filter(g=>g.paidDinner).length;
+      daTotal+=data.filter(g=>g.dineAround).length;
+      daPaid+=data.filter(g=>g.daPaid).length;
+      arrived.forEach(g=>{
+        if(g.arrivalTime){
+          const h=g.arrivalTime.split(':')[0]+':00';
+          hourCounts[h]=(hourCounts[h]||0)+1;
+        }
+      });
+    });
+
+    const bbRev=data=>data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    const daRev=data=>data.filter(g=>g.daPaid).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
+    let totalRev=0;
+    dates.forEach(date=>{
+      if(!history[date]) return;
+      totalRev+=bbRev(history[date].guests)+daRev(history[date].guests);
+    });
+
+    const avgOcc=totalDinner?Math.round(totalArrived/totalDinner*100):0;
+    const sortedHours=Object.entries(hourCounts).sort((a,b)=>b[1]-a[1]);
+    const peakHour=sortedHours[0]?sortedHours[0][0]:'-';
+    const quietHour=sortedHours[sortedHours.length-1]?sortedHours[sortedHours.length-1][0]:'-';
+
+    return {wk,label:getWeekLabel(wk),daysWithData,totalRooms,totalDinner,totalArrived,totalGuests,bbTotal,bbPaid,daTotal,daPaid,totalRev,avgOcc,peakHour,quietHour,avgRev:daysWithData?Math.round(totalRev/daysWithData):0};
+  });
+
+  const labels=weekData.map(w=>w.label);
+
+  document.getElementById('weekly-content').innerHTML=`
+    <!-- Overview cards -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
+      ${weekData.length===1?`
+      <div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
+        <div style="font-size:28px;font-weight:700;color:var(--blue);">${weekData[0].avgOcc}%</div>
+        <div style="font-size:11px;color:var(--muted);">${weekData[0].totalArrived}/${weekData[0].totalDinner} dinner rooms</div>
+      </div>
+      <div style="background:var(--green-bg);border:1px solid rgba(52,211,153,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:6px;">Total Revenue</div>
+        <div style="font-size:28px;font-weight:700;color:var(--green);">€${weekData[0].totalRev}</div>
+        <div style="font-size:11px;color:var(--muted);">Avg €${weekData[0].avgRev}/day</div>
+      </div>
+      <div style="background:var(--da-bg);border:1px solid rgba(249,115,22,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--da);font-weight:700;margin-bottom:6px;">Dine Around</div>
+        <div style="font-size:28px;font-weight:700;color:var(--da);">${weekData[0].daPaid}<span style="font-size:14px;color:var(--muted);"> / ${weekData[0].daTotal}</span></div>
+        <div style="font-size:11px;color:var(--muted);">paid / total DA</div>
+      </div>
+      <div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:6px;">BB Dinner</div>
+        <div style="font-size:28px;font-weight:700;color:var(--amber);">${weekData[0].bbPaid}<span style="font-size:14px;color:var(--muted);"> / ${weekData[0].bbTotal}</span></div>
+        <div style="font-size:11px;color:var(--muted);">paid / total BB rooms</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px;">Peak Hour</div>
+        <div style="font-size:28px;font-weight:700;color:var(--text);">${weekData[0].peakHour}</div>
+        <div style="font-size:11px;color:var(--muted);">busiest arrival hour</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px;">Quietest Hour</div>
+        <div style="font-size:28px;font-weight:700;color:var(--text);">${weekData[0].quietHour}</div>
+        <div style="font-size:11px;color:var(--muted);">fewest arrivals</div>
+      </div>`:''}
+    </div>
+
+    <!-- Comparison table for multiple weeks -->
+    ${weekData.length>1?`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px;">
+      <div style="padding:12px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;border-bottom:1px solid var(--border);">Weekly Comparison</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600;white-space:nowrap;">Week</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Occ%</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Revenue</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">DA paid</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">BB paid</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Peak</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Quiet</th>
+              <th style="padding:10px 8px;text-align:center;color:var(--muted);font-weight:600;">Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${weekData.map((w,i)=>`
+            <tr style="border-bottom:1px solid var(--border);background:${i%2===0?'transparent':'rgba(255,255,255,.02)'};">
+              <td style="padding:10px 12px;font-weight:600;color:var(--text);white-space:nowrap;">${w.label}</td>
+              <td style="padding:10px 8px;text-align:center;color:${w.avgOcc>=80?'var(--green)':w.avgOcc>=60?'var(--amber)':'var(--red)'};">${w.avgOcc}%</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--green);font-weight:600;">€${w.totalRev}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--da);">${w.daPaid}/${w.daTotal}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--amber);">${w.bbPaid}/${w.bbTotal}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--text);">${w.peakHour}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--muted);">${w.quietHour}</td>
+              <td style="padding:10px 8px;text-align:center;color:var(--muted);">${w.daysWithData}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`:''}
+
+    <!-- Charts -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Occupancy % per week</div>
+      <canvas id="wk-chart-occ" height="130"></canvas>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Revenue per week (€)</div>
+      <canvas id="wk-chart-rev" height="130"></canvas>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">DA paid vs BB paid per week</div>
+      <canvas id="wk-chart-bb-da" height="130"></canvas>
+    </div>
+  `;
+
+  document.getElementById('weekly-print-btn').style.display='block';
+  Chart.defaults.color='#8b90a8';
+  Chart.defaults.borderColor='rgba(255,255,255,0.06)';
+
+  new Chart(document.getElementById('wk-chart-occ'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Occupancy %',data:weekData.map(w=>w.avgOcc),backgroundColor:'rgba(96,165,250,0.3)',borderColor:'#60a5fa',borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  new Chart(document.getElementById('wk-chart-rev'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Revenue €',data:weekData.map(w=>w.totalRev),backgroundColor:'rgba(52,211,153,0.3)',borderColor:'#34d399',borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}}}
+  });
+
+  new Chart(document.getElementById('wk-chart-bb-da'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'DA paid',data:weekData.map(w=>w.daPaid),backgroundColor:'rgba(249,115,22,0.4)',borderColor:'#f97316',borderWidth:2,borderRadius:4},
+        {label:'BB paid',data:weekData.map(w=>w.bbPaid),backgroundColor:'rgba(251,191,36,0.4)',borderColor:'#fbbf24',borderWidth:2,borderRadius:4}
+      ]
+    },
+    options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#8b90a8'}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{stepSize:1}}}}
+  });
 }
 
 // ══════════════════════════════════════════════
 // MANUAL ENTRY
 // ══════════════════════════════════════════════
-const LS_MANUAL='wr_breakfast_manual_stats';
-function getManualEntries(){try{return JSON.parse(localStorage.getItem(LS_MANUAL)||'[]');}catch(e){return [];}}
-function saveManualEntries(e){localStorage.setItem(LS_MANUAL,JSON.stringify(e));}
+const LS_MANUAL = 'wr_manual_stats';
+
+function getManualEntries(){
+  try{return JSON.parse(localStorage.getItem(LS_MANUAL)||'[]');}catch(e){return [];}
+}
+function saveManualEntries(entries){
+  localStorage.setItem(LS_MANUAL, JSON.stringify(entries));
+}
 
 function addManualEntry(){
   const date=document.getElementById('me-date').value;
   const total=parseInt(document.getElementById('me-total').value)||0;
   const arrived=parseInt(document.getElementById('me-arrived').value)||0;
   const guestsServed=parseInt(document.getElementById('me-guests').value)||0;
-  const extrev=parseInt(document.getElementById('me-extrev').value)||0;
+  const bbrev=parseInt(document.getElementById('me-bbrev').value)||0;
+  const darev=parseInt(document.getElementById('me-darev').value)||0;
   const peak=document.getElementById('me-peak').value;
   const notes=document.getElementById('me-notes').value.trim();
+
   if(!date||!total||!arrived){alert('Please fill in Date, Total rooms and Rooms arrived.');return;}
+
   const entries=getManualEntries();
   const idx=entries.findIndex(e=>e.date===date);
-  const entry={date,total,arrived,guests:guestsServed,extrev,peak,notes};
-  if(idx>=0)entries[idx]=entry;else entries.push(entry);
+  const entry={date,total,arrived,guests:guestsServed,bbrev,darev,peak,notes,rev:bbrev+darev};
+  if(idx>=0) entries[idx]=entry; else entries.push(entry);
   entries.sort((a,b)=>a.date.localeCompare(b.date));
   saveManualEntries(entries);
-  ['me-date','me-total','me-arrived','me-guests','me-extrev','me-notes'].forEach(id=>document.getElementById(id).value='');
+
+  ['me-date','me-total','me-arrived','me-guests','me-bbrev','me-darev','me-notes'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('me-peak').value='';
+
   renderManualList();
-  alert('✓ Entry added! Press "Save to History" to save it.');
+  alert('✓ Entry added! Now press "Save to History" to save it.');
 }
 
 function deleteManualEntry(date){
   if(!confirm('Delete entry for '+date+'?'))return;
-  saveManualEntries(getManualEntries().filter(e=>e.date!==date));
+  const entries=getManualEntries().filter(e=>e.date!==date);
+  saveManualEntries(entries);
   renderManualList();
 }
 
@@ -1526,13 +2157,17 @@ function saveManualToHistory(date){
   const entries=getManualEntries();
   const e=entries.find(x=>x.date===date);
   if(!e) return;
+
+  // Check if already exists in history
   const h=getHistory();
   if(h[date]&&!confirm('History already has data for '+date+'.\nOverwrite with manual entry?')) return;
 
-  // Build synthetic guests array
+  // Build synthetic guests array from manual entry data
+  // Create fake HB rooms for arrived count
   const syntheticGuests=[];
   const paxPerRoom=e.guests&&e.arrived?Math.round(e.guests/e.arrived):2;
 
+  // Arrived rooms
   for(let i=0;i<e.arrived;i++){
     syntheticGuests.push({
       room:String(100+i).padStart(3,'0'),
@@ -1540,12 +2175,17 @@ function saveManualToHistory(date){
       adults:paxPerRoom,
       pkg:'HB',
       allergy:'',
+      noDinner:false,
       arrived:true,
-      arrivalTime:e.peak||'09:00',
-      paidExt:false,
+      arrivalTime:e.peak||'20:00',
+      paidDinner:false,
+      dineAround:false,
+      daPaid:false,
+      lungomare:false,
       _manual:true
     });
   }
+  // Not arrived rooms
   const notArrived=e.total-e.arrived;
   for(let i=0;i<notArrived;i++){
     syntheticGuests.push({
@@ -1554,42 +2194,91 @@ function saveManualToHistory(date){
       adults:2,
       pkg:'HB',
       allergy:'',
+      noDinner:false,
       arrived:false,
       arrivalTime:'',
-      paidExt:false,
+      paidDinner:false,
+      dineAround:false,
+      daPaid:false,
+      lungomare:false,
       _manual:true
     });
   }
-  // External paying guests
-  if(e.extrev>0){
-    const extRooms=Math.round(e.extrev/EXT_PRICE);
-    for(let i=0;i<extRooms;i++){
+  // BB rooms for revenue
+  if(e.bbrev>0){
+    const bbRooms=Math.round(e.bbrev/100);
+    for(let i=0;i<bbRooms;i++){
       syntheticGuests.push({
-        room:String(900+i).padStart(3,'0'),
-        name:'EXT GUEST '+(i+1),
-        adults:1,
-        pkg:'EXT',
+        room:String(700+i).padStart(3,'0'),
+        name:'BB GUEST '+(i+1),
+        adults:2,
+        pkg:'BB',
         allergy:'',
+        noDinner:false,
         arrived:true,
-        arrivalTime:e.peak||'09:00',
-        paidExt:true,
+        arrivalTime:e.peak||'20:00',
+        paidDinner:true,
+        dineAround:false,
+        daPaid:false,
+        lungomare:false,
+        _manual:true
+      });
+    }
+  }
+  // DA rooms for revenue
+  if(e.darev>0){
+    const daRooms=Math.round(e.darev/100);
+    for(let i=0;i<daRooms;i++){
+      syntheticGuests.push({
+        room:String(800+i).padStart(3,'0'),
+        name:'DA GUEST '+(i+1),
+        adults:2,
+        pkg:'HB',
+        allergy:'',
+        noDinner:false,
+        arrived:true,
+        arrivalTime:e.peak||'20:00',
+        paidDinner:false,
+        dineAround:true,
+        daPaid:true,
+        lungomare:false,
         _manual:true
       });
     }
   }
 
-  h[date]={date,savedAt:'Manual entry',manual:true,notes:e.notes||'',guests:syntheticGuests};
-  localStorage.setItem(LS_HISTORY,JSON.stringify(h));
+  const entry={
+    date,
+    savedAt:'Manual entry',
+    manual:true,
+    notes:e.notes||'',
+    guests:syntheticGuests
+  };
+
+  // Update ALL storage locations
+  _fbHistory[date]=entry;
+  const local=getLocalHistory();
+  local[date]=entry;
+  localStorage.setItem(LS_HISTORY,JSON.stringify(local));
+
+  // Save to Firebase
   if(fbConnected){
-    window._fbSet('breakfast_history/'+date, h[date])
+    window._fbSet('dinner_history/'+date, entry)
+      .then(()=>{
+        const badge=document.getElementById('autosave-badge');
+        badge.textContent='✓ Saved to History: '+date;
+        badge.style.color='var(--green)';badge.classList.add('show');
+        setTimeout(()=>badge.classList.remove('show'),3000);
+      })
       .catch(err=>console.error('Firebase history error:',err));
+  } else {
+    const badge=document.getElementById('autosave-badge');
+    badge.textContent='✓ Saved to History: '+date;
+    badge.style.color='var(--green)';badge.classList.add('show');
+    setTimeout(()=>badge.classList.remove('show'),3000);
   }
 
-  const badge=document.getElementById('autosave-badge');
-  badge.textContent='✓ Saved to History: '+date;
-  badge.style.color='var(--green)';
-  badge.classList.add('show');
-  setTimeout(()=>badge.classList.remove('show'),3000);
+  renderManualList();
 
   if(confirm('Saved to History! Go to History tab to see it?')){
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -1604,7 +2293,10 @@ function saveManualToHistory(date){
 function renderManualList(){
   const entries=getManualEntries();
   const el=document.getElementById('manual-entries-list');
-  if(!entries.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px;">No entries yet.</div>';return;}
+  if(!entries.length){
+    el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px;">No entries yet. Add data above.</div>';
+    return;
+  }
   el.innerHTML=entries.map(e=>{
     const d=new Date(e.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
     const rate=e.total?Math.round(e.arrived/e.total*100):0;
@@ -1614,8 +2306,10 @@ function renderManualList(){
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
         <div style="flex:1;">
           <div style="font-size:14px;font-weight:600;">${d}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${e.arrived}/${e.total} rooms · ${rate}% · €${e.extrev}${e.peak?' · Peak '+e.peak:''}</div>
-          ${e.notes?`<div style="font-size:11px;color:var(--gold);margin-top:2px;">📝 ${e.notes}</div>`:''}
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+            ${e.arrived}/${e.total} rooms · ${rate}% · €${e.rev}${e.peak?' · Peak '+e.peak:''}
+          </div>
+          ${e.notes?`<div style="font-size:11px;color:var(--blue);margin-top:2px;">📝 ${e.notes}</div>`:''}
         </div>
         <button onclick="deleteManualEntry('${e.date}')" style="background:transparent;border:1px solid rgba(248,113,113,.3);border-radius:6px;padding:5px 10px;color:var(--red);font-size:11px;cursor:pointer;">✕</button>
       </div>
@@ -1628,8 +2322,14 @@ function renderManualList(){
 
 function renderManualStats(){
   const entries=getManualEntries();
-  if(!entries.length){document.getElementById('manual-stats-content').innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);">No manual entries found.</div>';return;}
-  const totalRevenue=entries.reduce((s,e)=>s+e.extrev,0);
+  if(!entries.length){
+    document.getElementById('manual-stats-content').innerHTML='<div style="text-align:center;padding:2rem;color:var(--muted);">No manual entries found.</div>';
+    return;
+  }
+
+  const totalRevenue=entries.reduce((s,e)=>s+e.rev,0);
+  const totalBBRev=entries.reduce((s,e)=>s+e.bbrev,0);
+  const totalDARev=entries.reduce((s,e)=>s+e.darev,0);
   const totalArrived=entries.reduce((s,e)=>s+e.arrived,0);
   const totalRooms=entries.reduce((s,e)=>s+e.total,0);
   const totalGuests=entries.reduce((s,e)=>s+e.guests,0);
@@ -1637,20 +2337,24 @@ function renderManualStats(){
   const avgGuests=totalArrived?Math.round(totalGuests/totalArrived*10)/10:0;
   const bestDay=entries.reduce((b,e)=>{const r=e.total?e.arrived/e.total:0;return r>b.rate?{date:e.date,rate:r}:b;},{date:'',rate:0});
   const bestDayLabel=bestDay.date?new Date(bestDay.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'-';
-  const peakCounts={};entries.forEach(e=>{if(e.peak)peakCounts[e.peak]=(peakCounts[e.peak]||0)+1;});
+  const peakCounts={};
+  entries.forEach(e=>{if(e.peak)peakCounts[e.peak]=(peakCounts[e.peak]||0)+1;});
   const topPeak=Object.entries(peakCounts).sort((a,b)=>b[1]-a[1])[0];
+
   const labels=entries.map(e=>new Date(e.date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
+  const revData=entries.map(e=>e.rev);
+  const occData=entries.map(e=>e.total?Math.round(e.arrived/e.total*100):0);
 
   document.getElementById('manual-stats-content').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
       <div style="background:var(--green-bg);border:1px solid rgba(52,211,153,.25);border-radius:var(--radius-lg);padding:14px 16px;">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:700;margin-bottom:6px;">Total Ext. Revenue</div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:700;margin-bottom:6px;">Total Revenue</div>
         <div style="font-size:28px;font-weight:700;color:var(--green);">€${totalRevenue}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">${entries.length} days recorded</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">BB €${totalBBRev} · DA €${totalDARev}</div>
       </div>
-      <div style="background:var(--gold-bg);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-lg);padding:14px 16px;">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
-        <div style="font-size:28px;font-weight:700;color:var(--gold);">${avgOccupancy}%</div>
+      <div style="background:var(--blue-bg);border:1px solid rgba(96,165,250,.2);border-radius:var(--radius-lg);padding:14px 16px;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);font-weight:700;margin-bottom:6px;">Avg Occupancy</div>
+        <div style="font-size:28px;font-weight:700;color:var(--blue);">${avgOccupancy}%</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;">${totalArrived} / ${totalRooms} rooms</div>
       </div>
       <div style="background:var(--amber-bg);border:1px solid rgba(251,191,36,.2);border-radius:var(--radius-lg);padding:14px 16px;">
@@ -1670,12 +2374,12 @@ function renderManualStats(){
         <div style="font-size:22px;font-weight:700;">${avgGuests}</div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;">
-        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Total guests</div>
-        <div style="font-size:22px;font-weight:700;">${totalGuests}</div>
+        <div style="font-size:9px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Days recorded</div>
+        <div style="font-size:22px;font-weight:700;">${entries.length}</div>
       </div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px;">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">External Revenue per day (€)</div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:12px;">Revenue per day (€)</div>
       <canvas id="manual-chart-rev" height="120"></canvas>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;">
@@ -1684,9 +2388,21 @@ function renderManualStats(){
     </div>
   `;
 
-  Chart.defaults.color='#8b90a8';Chart.defaults.borderColor='rgba(255,255,255,0.06)';
-  new Chart(document.getElementById('manual-chart-rev'),{type:'bar',data:{labels,datasets:[{label:'Revenue (€)',data:entries.map(e=>e.extrev),backgroundColor:'rgba(52,211,153,0.3)',borderColor:'#34d399',borderWidth:2,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}}}});
-  new Chart(document.getElementById('manual-chart-occ'),{type:'line',data:{labels,datasets:[{label:'Occupancy %',data:entries.map(e=>e.total?Math.round(e.arrived/e.total*100):0),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',borderWidth:2,pointBackgroundColor:'#f59e0b',pointRadius:4,fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}});
+  Chart.defaults.color='#8b90a8';
+  Chart.defaults.borderColor='rgba(255,255,255,0.06)';
+
+  new Chart(document.getElementById('manual-chart-rev'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'Revenue (€)',data:revData,backgroundColor:'rgba(52,211,153,0.3)',borderColor:'#34d399',borderWidth:2,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,ticks:{callback:v=>'€'+v}}}}
+  });
+
+  new Chart(document.getElementById('manual-chart-occ'),{
+    type:'line',
+    data:{labels,datasets:[{label:'Occupancy %',data:occData,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.1)',borderWidth:2,pointBackgroundColor:'#60a5fa',pointRadius:4,fill:true,tension:0.3}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}
+  });
+
   document.getElementById('manual-print-btn').style.display='block';
 }
 
