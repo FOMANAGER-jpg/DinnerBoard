@@ -984,7 +984,10 @@ function renderHistory(){
   const el=document.getElementById('history-list');
   if(!dates.length){el.innerHTML='<div class="history-empty">&#128197; No saved days yet.<br><br>Auto-saves at 22:00 each evening.</div>';return;}
   el.innerHTML=dates.map(date=>{
-    const entry=history[date],data=entry.guests;
+    const entry=history[date];
+    if(!entry) return '';
+    const data=Array.isArray(entry.guests)?entry.guests:(entry.rooms||[]);
+    if(!data.length) return '';
     const dinnerG=data.filter(g=>!g.noDinner),arrived=dinnerG.filter(g=>g.arrived);
     const rate=dinnerG.length?Math.round((arrived.length/dinnerG.length)*100):0;
     const bbRev=data.filter(g=>g.paidDinner).reduce((s,g)=>s+(Number(g.adults)||0)*50,0);
@@ -1010,9 +1013,8 @@ function renderHistory(){
         </div>
       </div>
     </div>`;
-  }).join('');
+  }).filter(Boolean).join('');
 }
-function clearHistorySearch(){
   document.getElementById('history-search-input').value='';
   document.getElementById('history-search-results').innerHTML='';
 }
