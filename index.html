@@ -1407,13 +1407,15 @@ async function extractTextFromPDF(buffer,filename){
 
 // ══════════════════════════════════════════════
 // CHR/CSV PARSER — Protel allowance format
+// Verified from allowance.csv:
+// [35]=ROOM, [37]=PKG, [38]=GUEST
+// [41]=AD, [47]=BF_AT, [51]=DIN_AT
 // ══════════════════════════════════════════════
 function parseCHR(text, filename){
   const rooms=[];
   const lines=text.split('\n').filter(l=>l.trim().length>0);
 
   for(const line of lines){
-    // Parse all CSV fields handling quoted values
     const fields=[];
     let cur='', inQ=false;
     for(let i=0;i<line.length;i++){
@@ -1423,43 +1425,29 @@ function parseCHR(text, filename){
     }
     fields.push(cur.trim());
 
-    // Find room number — 3-digit number field
-    const roomIdx=fields.findIndex(f=>/^\d{3}$/.test(f));
-    if(roomIdx===-1) continue;
+    if(fields.length<52) continue;
 
-    const room=fields[roomIdx];
-    // PKG is next non-empty field after room (may be empty string)
-    const pkg=(fields[roomIdx+1]||'').trim();
-    // GUEST name is 2 fields after room
-    const name=(fields[roomIdx+2]||'').trim();
-    // ARR = roomIdx+3, DEP = roomIdx+4, AD = roomIdx+5
-    const adults=parseInt(fields[roomIdx+5])||0;
+    const room=fields[35];
+    if(!/^\d{3}$/.test(room)) continue;
 
-    // Dinner column: after AD,EB,C1,C2,C3,C4 = 6 fields, then BF_AT,BF_CH,LU_AT,LU_CH,DIN_AT
-    // roomIdx+5=AD, +6=EB, +7=C1, +8=C2, +9=C3, +10=C4
-    // +11=BF_AT, +12=BF_CH, +13=LU_AT, +14=LU_CH, +15=DIN_AT, +16=DIN_CH
-    const dinnerAt=parseInt(fields[roomIdx+15])||0;
+    const pkg=(fields[37]||'').trim();
+    const name=(fields[38]||'').trim();
+    const adults=Math.round(parseFloat(fields[41])||0);
+    const dinAt=Math.round(parseFloat(fields[51])||0);
 
     if(!name||name==='TOTAL:'||name==='ROOMS'||name==='ADULTS'||name==='Extra Bed :') continue;
-    // Skip if name looks like a number or date
     if(/^\d/.test(name)) continue;
 
-    const hasDinner=dinnerAt>0;
     const isBB=pkg==='BB';
+    const hasDinner=dinAt>0;
 
     rooms.push({
-      room,
-      name,
-      adults,
+      room,name,adults,
       pkg:pkg||'HB',
       allergy:'',
       noDinner:!hasDinner||isBB,
-      arrived:false,
-      arrivalTime:'',
-      paidDinner:false,
-      dineAround:false,
-      daPaid:false,
-      lungomare:false
+      arrived:false,arrivalTime:'',
+      paidDinner:false,dineAround:false,daPaid:false,lungomare:false
     });
   }
 
@@ -2088,13 +2076,12 @@ function renderWeeklyStats(){
 // ══════════════════════════════════════════════
 // MANUAL ENTRY
 // ══════════════════════════════════════════════
-const LS_MANUAL = 'wr_manual_stats';
-
+const LS_MANUAL='wr_dinner_manual_stats';
 function getManualEntries(){
-  try{return JSON.parse(localStorage.getItem(LS_MANUAL)||'[]');}catch(e){return [];}
+  try{return JSON.parse(sessionStorage.getItem(LS_MANUAL)||'[]');}catch(e){return [];}
 }
 function saveManualEntries(entries){
-  localStorage.setItem(LS_MANUAL, JSON.stringify(entries));
+  try{sessionStorage.setItem(LS_MANUAL,JSON.stringify(entries));}catch(e){console.warn('Session storage full');}
 }
 
 function addManualEntry(){
