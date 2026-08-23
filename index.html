@@ -9,7 +9,7 @@
 <script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+import { getDatabase, ref, set, onValue, goOnline } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCTLy2osf3ORBYdOm-EqpxiYbQkpOrlBIU",
@@ -21,15 +21,15 @@ const firebaseConfig = {
   appId: "1:784177296893:web:852b36e467f97c14fa5594"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig, 'dinner-app');
 const db = getDatabase(app);
 
-// Expose Firebase functions globally so rest of app can use them
+goOnline(db);
+
 window._fbSet = (path, data) => set(ref(db, path), data);
 window._fbListen = (path, cb) => onValue(ref(db, path), snap => cb(snap.val()));
 window._fbReady = true;
 
-// Notify app that Firebase is ready
 document.dispatchEvent(new Event('firebase-ready'));
 </script>
 <style>
