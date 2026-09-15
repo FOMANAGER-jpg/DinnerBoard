@@ -606,8 +606,22 @@ function pushToFirebase(){
 
 // Save today to BOTH Firebase and localStorage
 function saveToday(silent){
+  // Don't save if no guests loaded yet
+  if(!guests||guests.length===0){
+    if(!silent) console.log('saveToday: skipped - no guests loaded');
+    return;
+  }
+  // Don't overwrite a good save with an empty one
+  const arrived=guests.filter(g=>g.arrived).length;
+  const existing=_fbHistory[TODAY];
+  if(existing&&existing.guests&&existing.guests.length>0){
+    const existingArrived=existing.guests.filter(g=>g.arrived).length;
+    if(arrived===0&&existingArrived>0){
+      if(!silent) console.log('saveToday: skipped - would overwrite better data');
+      return;
+    }
+  }
   const entry={date:TODAY,savedAt:nowTime(),guests:JSON.parse(JSON.stringify(guests))};
-  // Save ONLY to Firebase — localStorage is too small for history
   if(fbConnected){
     window._fbSet('dinner_history/'+TODAY, entry)
       .catch(e=>console.error('History save error:',e));
