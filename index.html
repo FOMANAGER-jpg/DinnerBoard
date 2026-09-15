@@ -1103,45 +1103,37 @@ function importJSONHistory(e){
   reader.onload=function(ev){
     try{
       const data=JSON.parse(ev.target.result);
-      // Support both full export format and raw history object
       let days=[];
       if(data.days&&Array.isArray(data.days)){
-        days=data.days; // Full export format
+        days=data.days;
       } else if(typeof data==='object'){
-        // Raw history object {date: entry}
         days=Object.values(data);
       }
       if(!days.length){alert('No data found in JSON file.');return;}
 
-      const h=getHistory();
-      let imported=0, skipped=0;
+      let imported=0;
 
       days.forEach(entry=>{
         const date=entry.date;
         if(!date) return;
-        if(h[date]){
-          skipped++;
-        }
-        // Build history entry
-        h[date]={
+        const histEntry={
           date,
           savedAt:entry.savedAt||'Imported',
           manual:entry.manual||false,
           guests:entry.rooms||entry.guests||[]
         };
-        imported++;
-        // Also save to Firebase
+        // Update local cache
+        _fbHistory[date]=histEntry;
+        // Save ONLY to Firebase
         if(fbConnected){
-          window._fbSet('dinner_history/'+date, h[date])
+          window._fbSet('dinner_history/'+date, histEntry)
             .catch(err=>console.error(err));
         }
+        imported++;
       });
 
-      localStorage.setItem(LS_HISTORY,JSON.stringify(h));
-      _fbHistory=h;
       renderHistory();
-
-      alert(`✓ Imported ${imported} day${imported!==1?'s':''}${skipped?' ('+skipped+' already existed and were updated)':''}`);
+      alert(`✓ Imported ${imported} day${imported!==1?'s':''} to Firebase`);
     }catch(err){
       alert('Error reading JSON: '+err.message);
     }
